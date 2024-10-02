@@ -110,4 +110,7 @@ body {
 .text-accent {
   color: hsl(var(--accent));
 }
+.bg-background {
+  background-color: hsl(var(--background));
+}
 }
