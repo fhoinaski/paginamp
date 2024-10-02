@@ -22,7 +22,7 @@ export default function Home() {
       <section className="relative bg-brand transition duration-500 dark:bg-brand-dark">
         <div className="card container py-24 text-center">
           <h2 className="text-xl font-bold uppercase text-white sm:text-2xl">
-            Crescer só depende de você
+            Crescer só depende de você.
           </h2>
           <a 
             href="#modelos" 
