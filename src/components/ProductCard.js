@@ -92,7 +92,7 @@ const ProductCard = ({ product }) => {
     const desconto = calcularDesconto(product.normalPrice, product.price);
 
     return (
-        <div id="modelos" className="card relative rounded-lg rounded-tl-xl border bg-background p-4 pt-10 shadow">
+        <div id="modelos" className="card relative rounded-lg rounded-tl-xl border bg-white p-4 pt-10 shadow z-10">
             {/* Ícone superior direito */}
             <div className="absolute -left-px -top-px rounded-br-lg rounded-tl-lg border-b border-r bg-gradient-to-r from-[#1aa271] to-[#00b87d] px-2 py-1">
                 {/* Ícone SVG complexo - Substitua pelo seu ícone ou imagem */}
