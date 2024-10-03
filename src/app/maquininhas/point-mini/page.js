@@ -8,13 +8,14 @@ import TestimonialSlider from '../../../components/TestimonialSlider';
 import HeroSectionPointMini from '../../../components/points/HeroSectionPointMini';
 import SectionConta from '../../../components/SectionConta';
 import SectionPointMini from '../../../components/SectionPointMini';
+import MenuPopover from '../../../components/MenuPopover';
 
 
 
 export default function Home() {
   return (
     <div className="w-screen m-0 p-0">
- 
+      <MenuPopover />
       <HeroSectionPointMini />
       <CardFlag />
       <SectionTaxas />

@@ -8,7 +8,7 @@ const HeroSectionPointSmart = () => {
 
     return (
         <section>
-            <div className="relative bg-gradient-to-b py-8 md:bg-gradient-to-br md:py-12 bg-slate-950">
+            <div className="relative bg-gradient-to-b py-8 md:bg-gradient-to-br md:py-12 bg-slate-950 mt-16">
                 <div className="card container grid grid-cols-1 gap-8 md:grid-cols-2">
                     <div className="flex flex-col items-center text-center md:items-start md:justify-center md:text-left">
                         <div className="inline-flex items-center border rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-brand border-transparent hover:bg-brand/80 uppercase text-white">Point Smart 2</div>

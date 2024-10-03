@@ -8,11 +8,13 @@ import TestimonialSlider from '../../../components/TestimonialSlider';
 import HeroSectionPointAir from '../../../components/points/HeroSectionPointAir';
 import SectionConta from '../../../components/SectionConta';
 import SectionNovaAir from '../../../components/SectionNovaAir';
+import MenuPopover from '../../../components/MenuPopover';
 
 
 export default function Home() {
   return (
     <div className="w-screen m-0 p-0">
+      <MenuPopover /> 
       <HeroSectionPointAir />
       <CardFlag />
       <SectionTaxas />

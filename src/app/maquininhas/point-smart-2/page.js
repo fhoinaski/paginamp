@@ -6,12 +6,14 @@ import SectionConta from '../../../components/SectionConta';
 import SectionCredito from '../../../components/SectionCredito';
 import SectionLinkVendas from '../../../components/SectionLinkVendas';
 import TestimonialSlider from '../../../components/TestimonialSlider';
+import MenuPopover from '../../../components/MenuPopover';
 
 
 
 export default function Home() {
   return (
     <div className="w-screen m-0 p-0">
+      <MenuPopover /> 
       <HeroSectionPointSmart2 />
       <CardFlag />
       <SectionTaxas />
