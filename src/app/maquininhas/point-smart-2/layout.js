@@ -1,11 +1,7 @@
 
-import "./globals.css";
-
-
-
 
 export const metadata = {
-  title: "Maquininhas Point",
+  title: "Point Smart 2",
   description: "Escolha a maquininha perfeita para o seu negócio",
 };
 
@@ -15,8 +11,6 @@ export default function RootLayout({ children }) {
       <body
        
       >
-            
-        
         {children}
       </body>
     </html>
