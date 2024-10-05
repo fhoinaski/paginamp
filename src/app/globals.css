@@ -82,12 +82,31 @@ body {
     text-wrap: balance;
   }
   .container {
-    width: 100%;
+    max-width: 1024px;
     margin-right: auto;
     margin-left: auto;
     padding-right: 1rem;
     padding-left: 1rem;
+    
   }
+  @media (max-width: 1024px) {
+    .container {
+      max-width:90%;
+      margin-right: auto;
+      margin-left: auto;
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
+}
+  @media (max-width: 768px) {
+    .container {
+      max-width:100%;
+      margin-right: auto;
+      margin-left: auto;
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
+}
   .bg-primary-foreground {
     background-color: hsl(var(--primary-foreground));
   }
@@ -112,5 +131,10 @@ body {
 }
 .bg-background {
   background-color: hsl(var(--background));
+}
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 }
