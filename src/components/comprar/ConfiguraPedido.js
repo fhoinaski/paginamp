@@ -1,11 +1,10 @@
-'use client'
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { fetchProductData } from "../../data/productData";
 import InternetProviderSelector from "./InternetProviderSelector";
 import OrderConfiguration from "./OrderConfiguration";
 
 const ConfiguraPedido = ({ productModel }) => {
-    const [selectedProvider, setSelectedProvider] = useState('36');
+    const [selectedProvider, setSelectedProvider] = useState('36'); // Default to Vivo
     const [productData, setProductData] = useState(null);
     const [buyLink, setBuyLink] = useState('');
     const [showProviderSelector, setShowProviderSelector] = useState(false);
@@ -19,7 +18,7 @@ const ConfiguraPedido = ({ productModel }) => {
         if (currentProduct) {
             const isPointMiniNFC2 = currentProduct.name === "Point Mini NFC 2";
             setShowProviderSelector(!modelsWithoutProvider.includes(currentProduct.name));
-            updateBuyLink(currentProduct, selectedProvider, isPointMiniNFC2);
+            updateBuyLink(currentProduct, '36', isPointMiniNFC2); // Always use '36' (Vivo) initially
         }
     }, [productModel]);
 
@@ -27,7 +26,7 @@ const ConfiguraPedido = ({ productModel }) => {
         if (product) {
             if (isPointMiniNFC2) {
                 setBuyLink(product.linkPedido || product.urlBuy);
-            } else if (showProviderSelector && product.linkOperadoras && Array.isArray(product.linkOperadoras)) {
+            } else if (product.linkOperadoras && Array.isArray(product.linkOperadoras)) {
                 const providerName = getProviderName(providerId);
                 const providerLink = product.linkOperadoras.find(op => op.name.toLowerCase() === providerName.toLowerCase());
                 setBuyLink(providerLink ? providerLink.url : product.urlBuy);
