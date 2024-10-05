@@ -1,3 +1,5 @@
+import "./globals.css";
+
 export const metadata = {
   title: "Maquininhas Point | Revendedor autorizado Point Enoc Maquininhas",
   description: "Escolha a maquininha perfeita para o seu negócio",
