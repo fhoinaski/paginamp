@@ -4,7 +4,7 @@ const productData = [
       {
         name: "Point Smart 2",
         normalPrice: "840,80",
-        price: "398,99",
+        price: "239,99",
         urlBuy: "/comprar/point-smart-2",
         imageUrl: "/images/devices/device-smart.webp",
         urlInfo: "/maquininhas/point-smart-2",
@@ -26,7 +26,7 @@ const productData = [
       {
         name: "Point Pro 2",
         normalPrice: "718,80",
-        price: "99,90",
+        price: "89,99",
         imageUrl: "/images/devices/device-pro.webp",
         urlBuy: "/comprar/point-pro-2",
         urlInfo: "/maquininhas/point-pro-2",
@@ -48,7 +48,7 @@ const productData = [
       {
         name: "Point Air",
         normalPrice: "358,80",
-        price: "69,90",
+        price: "59,99",
         urlBuy: "/comprar/point-air",
         urlInfo: "/maquininhas/point-air",
         imageUrl: "/images/devices/device-air.webp",
@@ -70,7 +70,7 @@ const productData = [
       {
         name: "Point Mini NFC 2",
         normalPrice: "118,80",
-        price: "49,99",
+        price: "59,99",
         urlBuy: "/comprar/point-mini-nfc-2",
         urlInfo: "/maquininhas/point-mini-nfc-2",
         imageUrl: "/images/devices/device-mini.webp",

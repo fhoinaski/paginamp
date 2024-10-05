@@ -16,7 +16,7 @@ const MercadoPagoHero = () => {
         </div>
         <div className="flex justify-center">
           <Image
-            src="/images/hero.png"
+            src="/images/herotaxas.png"
             alt="hero-image"
             width={450}
             height={450}

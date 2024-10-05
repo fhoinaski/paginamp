@@ -8,6 +8,7 @@ import SectionCredito from '../components/SectionCredito';
 import SectionLinkVendas from '../components/SectionLinkVendas';
 import TestimonialSlider from '../components/TestimonialSlider';
 
+
 export default function Home() {
   return (
     <div className="w-screen m-0 p-0">
@@ -15,6 +16,7 @@ export default function Home() {
       <Produtos />
       <CardFlag />
       <SectionTaxas />
+      
       <SectionConta />
       <SectionCredito />
       <SectionLinkVendas />
