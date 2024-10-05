@@ -4,7 +4,7 @@ const SectionPointMini = () => {
     return (
         <section >
             <div className="card container grid grid-cols-1 gap-8 py-16 sm:grid-cols-2 ">
-                <h2 className="self-end text-center text-2xl font-semibold sm:text-left sm:text-3xl">Como cobrar com a Point Mini NFC 2</h2>
+                <h2 className="self-end text-center text-2xl font-semibold sm:text-left sm:text-3xl">Como cobrar com a Point Mini NFC 2 NFC 2</h2>
                 <div>
                     <ol className="space-y-6">
                         <li className="flex gap-4">

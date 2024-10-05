@@ -1,7 +1,7 @@
-
+import './style.css';
 
 export const metadata = {
-    title: "Point Mini NFC2",
+    title: "Configure seu Pedido - Point Smart 2",
     description: "Escolha a maquininha perfeita para o seu negócio",
   };
   
@@ -11,11 +11,6 @@ export const metadata = {
         <body
          
         >
-          <header>
-<div>
-  
-</div>
-          </header>
           {children}
         </body>
       </html>

@@ -1,15 +1,19 @@
 // src/data/productData.js
 
-export const fetchProductData = () => {
-    return [
+const productData = [
       {
         name: "Point Smart 2",
         normalPrice: "840,80",
-        price: "249,99",
+        price: "398,99",
         urlBuy: "/comprar/point-smart-2",
         imageUrl: "/images/devices/device-smart.webp",
         urlInfo: "/maquininhas/point-smart-2",
         info: "A maquininha mais avançada",
+        linkOperadoras:[
+          {name: "Vivo", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/37728883:1"},
+          {name: "Claro", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/37728885:1"},
+          {name: "Tim", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/37728884:1"}
+        ],
         specifications: [
           { text: "Plano de dados grátis e Wi-Fi", type: "wifi" },
           { text: "Imprime o comprovante", type: "Imprime o comprovante" },
@@ -20,13 +24,18 @@ export const fetchProductData = () => {
         ]
       },
       {
-        name: "Point Pro",
+        name: "Point Pro 2",
         normalPrice: "718,80",
-        price: "129,90",
+        price: "99,90",
         imageUrl: "/images/devices/device-pro.webp",
-        urlBuy: "/comprar/point-pro",
-        urlInfo: "/maquininhas/point-pro",
+        urlBuy: "/comprar/point-pro-2",
+        urlInfo: "/maquininhas/point-pro-2",
         info: "Bateria que dura o dia todo",
+        linkOperadoras:[
+          {name: "Vivo", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840125:1"},
+          {name: "Claro", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840127:1"},
+          {name: "Tim", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840126:1"}
+        ],
         specifications: [
           { text: "Plano de dados grátis e Wi-Fi", type: "wifi" },
           { text: "Imprime o comprovante", type: "Imprime o comprovante" },
@@ -39,11 +48,16 @@ export const fetchProductData = () => {
       {
         name: "Point Air",
         normalPrice: "358,80",
-        price: "79,90",
+        price: "69,90",
         urlBuy: "/comprar/point-air",
         urlInfo: "/maquininhas/point-air",
         imageUrl: "/images/devices/device-air.webp",
         info: "Não precisa de celular",
+        linkOperadoras:[
+          {name: "Vivo", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21838973:1"},
+          {name: "Claro", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21838974:1"},
+          {name: "Tim", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/158408657:1"}
+        ],
         specifications: [
           { text: "Plano de dados grátis e Wi-Fi", type: "wifi" },
           { text: "Envia comprovante por SMS", type: "sms" },
@@ -54,13 +68,14 @@ export const fetchProductData = () => {
         ]
       },
       {
-        name: "Point Mini",
+        name: "Point Mini NFC 2",
         normalPrice: "118,80",
-        price: "25,00",
-        urlBuy: "/comprar/point-mini",
-        urlInfo: "/maquininhas/point-mini",
+        price: "49,99",
+        urlBuy: "/comprar/point-mini-nfc-2",
+        urlInfo: "/maquininhas/point-mini-nfc-2",
         imageUrl: "/images/devices/device-mini.webp",
         info: "Use com seu celular",
+        linkPedido: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840677:1",
         specifications: [
           { text: "Conexão via Bluetooth com celualar", type: "bluetooth" },
           { text: "Envia comprovante por SMS", type: "sms" },
@@ -71,4 +86,5 @@ export const fetchProductData = () => {
         ]
       }
     ];
-  };
+  
+  export const fetchProductData = () => productData;
