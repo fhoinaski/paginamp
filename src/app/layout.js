@@ -3,16 +3,54 @@ import Script from 'next/script';
 
 export const metadata = {
   title: "Maquininhas Point | Revendedor autorizado Point Enoc Maquininhas",
-  description: "Escolha a maquininha perfeita para o seu negócio",
+  description: "Escolha a maquininha perfeita para o seu negócio. Oferecemos as melhores opções de maquininhas Point, incluindo a Point Pro 2 com conexão 3G e Wi-Fi. Menores taxas do mercado e recebimento na hora.",
+  keywords: "maquininhas point, mercado pago, point pro 2, máquina de cartão, pagamento, débito, crédito",
+  openGraph: {
+    title: "Maquininhas Point | Revendedor autorizado Point Enoc Maquininhas",
+    description: "Escolha a maquininha perfeita para o seu negócio. Oferecemos as melhores opções de maquininhas Point, incluindo a Point Pro 2.",
+    type: "website",
+    url: "https://www.seusite.com.br",
+    images: [
+      {
+        url: "https://www.seusite.com.br/images/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Maquininhas Point",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Maquininhas Point | Revendedor autorizado Point Enoc Maquininhas",
+    description: "Escolha a maquininha perfeita para o seu negócio. Oferecemos as melhores opções de maquininhas Point, incluindo a Point Pro 2.",
+    images: ["https://www.enocmaquininhas.com.br/images/herotaxas.png"],
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-br">
+    <html lang="pt-BR">
       <head>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='%23009EE3' rx='5.273' ry='5.273'></rect><rect width='27.984' height='12.023' x='4.008' y='4.008' fill='%23A5F3FC' rx='1.758' ry='1.758'></rect><g fill='%232E3441'><circle cx='6.012' cy='21.973' r='2.004'></circle><circle cx='6.012' cy='29.988' r='2.004'></circle><circle cx='14.027' cy='21.973' r='2.004'></circle><circle cx='14.027' cy='29.988' r='2.004'></circle><circle cx='21.973' cy='21.973' r='2.004'></circle><circle cx='21.973' cy='29.988' r='2.004'></circle><circle cx='29.988' cy='21.973' r='2.004'></circle><circle cx='29.988' cy='29.988' r='2.004'></circle></g></svg>" type="image/svg+xml" />
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="canonical" href="https://www.enocmaquininhas.com.br/" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Script id="schema-markup" type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Enoc Maquininhas",
+              "description": "Revendedor autorizado de maquininhas Point do Mercado Pago",
+              "url": "https://www.enocmaquininhas.com.br/",
+              "logo": "https://www.enocmaquininhas.com.br/favicon.svg",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "",
+                "contactType": "customer service"
+              }
+            }
+          `}
+        </Script>
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -27,17 +65,18 @@ export default function RootLayout({ children }) {
             fbq('track', 'PageView');
           `}
         </Script>
+      </head>
+      <body>
+        {children}
         <noscript>
           <img
             height="1"
             width="1"
             style={{ display: 'none' }}
             src="https://www.facebook.com/tr?id=546621900705567&ev=PageView&noscript=1"
+            alt="Facebook Pixel"
           />
         </noscript>
-      </head>
-      <body>
-        {children}
       </body>
     </html>
   );
