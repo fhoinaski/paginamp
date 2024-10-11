@@ -10,9 +10,9 @@ const productData = [
         urlInfo: "/maquininhas/point-smart-2",
         info: "A maquininha mais avançada",
         linkOperadoras:[
-          {name: "Vivo", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/37728883:1"},
-          {name: "Claro", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/37728885:1"},
-          {name: "Tim", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/37728884:1"}
+          {name: "Vivo", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/P2VI85Y7YZ"},
+          {name: "Claro", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/43J1PJ1OM8"},
+          {name: "Tim", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/NKV81BCPAR"}
         ],
         specifications: [
           { text: "Plano de dados grátis e Wi-Fi", type: "wifi" },
@@ -32,9 +32,9 @@ const productData = [
         urlInfo: "/maquininhas/point-pro-2",
         info: "Bateria que dura o dia todo",
         linkOperadoras:[
-          {name: "Vivo", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840125:1"},
-          {name: "Claro", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840127:1"},
-          {name: "Tim", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840126:1"}
+          {name: "Vivo", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/NE6414IYET"},
+          {name: "Claro", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/60CQTYX2JV"},
+          {name: "Tim", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/25KO8KVS9F"}
         ],
         specifications: [
           { text: "Plano de dados grátis e Wi-Fi", type: "wifi" },
@@ -54,9 +54,9 @@ const productData = [
         imageUrl: "/images/devices/device-air.webp",
         info: "Não precisa de celular",
         linkOperadoras:[
-          {name: "Vivo", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21838973:1"},
-          {name: "Claro", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21838974:1"},
-          {name: "Tim", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/158408657:1"}
+          {name: "Vivo", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/948BUCPMM0"},
+          {name: "Claro", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/7VAOZHR4W3"},
+          {name: "Tim", url: "https://enoc-maquininhas-br.pay.yampi.com.br/r/93P5E7V1ZI"}
         ],
         specifications: [
           { text: "Plano de dados grátis e Wi-Fi", type: "wifi" },
@@ -75,7 +75,7 @@ const productData = [
         urlInfo: "/maquininhas/point-mini-nfc-2",
         imageUrl: "/images/devices/device-mini.webp",
         info: "Use com seu celular",
-        linkPedido: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840677:1",
+        linkPedido: "https://enoc-maquininhas-br.pay.yampi.com.br/r/40WK3PGTN0",
         specifications: [
           { text: "Conexão via Bluetooth com celualar", type: "bluetooth" },
           { text: "Envia comprovante por SMS", type: "sms" },
