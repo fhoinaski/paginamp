@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import ConfiguraPedido from '../../../components/comprar/ConfiguraPedido';
 import { slugToName } from '../../../utils/formatters';
 
+// Adicionando diretiva para forçar renderização dinâmica
+export const dynamic = 'force-dynamic';
+
 // Esta página é um Server Component
 export default async function ComprarPage({ params }) {
   try {
@@ -74,36 +77,5 @@ export default async function ComprarPage({ params }) {
   }
 }
 
-// Gerar caminhos estáticos durante o build
-export async function generateStaticParams() {
-  try {
-    // Usar URL absoluta para Server Components
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
-                  (typeof window === 'undefined' ? 'http://localhost:3000' : '');
-    
-    // Adicionar um timestamp para evitar cache
-    const timestamp = Date.now();
-    
-    const response = await fetch(`${apiUrl}/api/products?t=${timestamp}`, {
-      cache: 'no-store', // Garantir que não use cache
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    });
-    
-    if (!response.ok) {
-      return [];
-    }
-    
-    const { products } = await response.json();
-    
-    return products.map(product => ({
-      model: product.name.toLowerCase().replace(/\s+/g, '-')
-    }));
-  } catch (error) {
-    console.error('Erro ao gerar parâmetros estáticos:', error);
-    return [];
-  }
-}
+// Como agora a página é totalmente dinâmica, podemos remover a função generateStaticParams
+// pois ela não será utilizada com dynamic: 'force-dynamic'
