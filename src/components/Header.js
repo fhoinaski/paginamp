@@ -9,7 +9,7 @@ const Header = () => {
 
 
   return (
-    <header className="bg-white dark:bg-slate-900 shadow fixed top-0 left-0 w-full z-50 transition-colors">
+    <header className="bg-gradient-28 dark:bg-slate-900 shadow fixed top-0 left-0 w-full z-50 transition-colors">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-4">
    

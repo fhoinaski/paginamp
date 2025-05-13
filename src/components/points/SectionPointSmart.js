@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTaxasModal } from '../../contexts/TaxasModalContext';
 
-const SectionPointPro = () => {
+const SectionPointSmart = () => {
     const [activeRange, setActiveRange] = useState(0); // Voltando para o primeiro estado para corresponder à imagem
     
     // Usando o contexto do modal
@@ -202,7 +202,7 @@ const SectionPointPro = () => {
                     </div>
                     
                     {/* Card da maquininha */}
-                    <div className="md:w-1/2 bg-[#f5f5f5] rounded-3xl shadow-sm flex items-center justify-center overflow-hidden max-w-xl p-4">
+                    <div className="md:w-1/2  rounded-3xl  flex items-center justify-center overflow-hidden max-w-xl p-4">
                         <div className="relative w-full h-full flex items-center justify-center">
                         <video 
                                     autoPlay 
@@ -217,11 +217,13 @@ const SectionPointPro = () => {
                                         outline: "none", 
                                         pointerEvents: "none",
                                         objectFit: "cover",
-                                        display: "block"
+                                        display: "block",
+                                        borderRadius: "10px"
+                                        
                                     }}
                                 >
                                     <source 
-                                        src="/videos/pro3.mp4" 
+                                        src="/videos/smart.mp4" 
                                         type="video/mp4" 
                                     />
                                 </video>
@@ -234,4 +236,4 @@ const SectionPointPro = () => {
     );
 }
 
-export default SectionPointPro; 
+export default SectionPointSmart; 

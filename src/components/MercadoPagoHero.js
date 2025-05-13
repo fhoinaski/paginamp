@@ -4,7 +4,7 @@ import { CreditCard, Banknote, CalendarX } from 'lucide-react';
 
 const MercadoPagoHero = () => {
   return (
-    <section className="relative bg-gradient-28 pb-24 pt-8 md:pt-12 m-0">
+    <section className="relative bg-gradient-28 pb-24 pt-8 md:pt-12 m-0 rounded-xl shadow-lg">
       <div className="container mx-auto grid grid-cols-1 gap-8 md:grid-cols-2  ">
         <div className="flex flex-col  gap-4 text-center md:items-start md:justify-center md:text-left max-w-[480px] ">
         <div className="inline-flex items-center border rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent  uppercase text-black max-w-[200px] justify-center mx-auto md:mx-0">

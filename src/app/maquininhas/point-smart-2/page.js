@@ -7,7 +7,9 @@ import SectionCredito from '../../../components/SectionCredito';
 import SectionLinkVendas from '../../../components/SectionLinkVendas';
 import TestimonialSlider from '../../../components/TestimonialSlider';
 import MenuPopover from '../../../components/MenuPopover';
-
+import SectionAboutPointSmart from '../../../components/points/SectionAboutPointSmart';
+import SectionPointSmart from '../../../components/points/SectionPointSmart';
+import SectionSmartFerramenta from '../../../components/points/SectionSmartFerramenta';
 
 
 export default function Home() {
@@ -15,11 +17,13 @@ export default function Home() {
     <div className="w-screen m-0 p-0">
       <MenuPopover /> 
       <HeroSectionPointSmart2 />
-      <SectionTaxas />
+      <SectionPointSmart />
       <CardFlag />
-      <SectionCredito />
+      <SectionAboutPointSmart />
+      <SectionSmartFerramenta />
+      {/* <SectionCredito /> */}
       <SectionConta />
-      <SectionLinkVendas />
+
       <TestimonialSlider />
       <section className="relative transition duration-500  bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%]">
         <div className="card container py-24 text-center">
