@@ -40,7 +40,7 @@ const HeroSectionPointMini = () => {
 
     return (
         <section>
-            <div className="relative bg-gradient-to-b py-8 md:bg-gradient-to-br md:py-12 from-[#FFE600_100%] to-[#FFD400_28%] mt-16">
+            <div className="relative bg-gradient-28 py-8  md:py-12  mt-16">
                 <div className="card container grid grid-cols-1 gap-8 md:grid-cols-2">
                     <div className="flex flex-col items-center text-center md:items-start md:justify-center md:text-left">
                         <div className="inline-flex items-center border rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2  border-transparent  uppercase text-black">Point Mini NFC 2 NFC2</div>
@@ -61,7 +61,7 @@ const HeroSectionPointMini = () => {
                             height={450}
                             decoding="async"
                             data-nimg="1"
-                            className="object-contain"
+                            className="object-contain animate-float"
                             src="/images/point/device-45.webp"
                             style={{ color: 'transparent' }}
                         />

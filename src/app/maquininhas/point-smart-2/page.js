@@ -17,8 +17,8 @@ export default function Home() {
       <HeroSectionPointSmart2 />
       <SectionTaxas />
       <CardFlag />
-      <SectionConta />
       <SectionCredito />
+      <SectionConta />
       <SectionLinkVendas />
       <TestimonialSlider />
       <section className="relative transition duration-500  bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%]">

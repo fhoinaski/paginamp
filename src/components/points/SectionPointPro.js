@@ -11,6 +11,14 @@ const SectionPointPro = () => {
     
     // Definição das taxas por faixa de valores
     const taxRanges = [
+
+        // taxa promo
+        {
+            debito: '0,74',
+            credito: '0,74',
+            credito12x: '8,99'
+        },
+
         // Até R$5 mil
         {
             debito: '1,61',
@@ -75,10 +83,10 @@ const SectionPointPro = () => {
                                 {/* Botões */}
                                 <div className="relative z-10 flex">
                                     <button 
-                                        className={`switch-bar__button flex-1 py-2 md:py-3 font-medium text-center transition-colors duration-200 ${activeRange === 0 ? 'switch-bar__button--active text-black' : 'text-gray-500'}`}
+                                        className={`switch-bar__button flex-1 py-2 md:py-3  text-center font-extrabold transition-colors duration-200 ${activeRange === 0 ? 'switch-bar__button--active text-emerald-600' : 'text-gray-500'}`}
                                         onClick={() => handleRangeClick(0)}
                                     >
-                                        Até<br className="block" /> R$ 5 mil
+                                      PROMO
                                     </button>
                                     <button 
                                         className={`switch-bar__button flex-1 py-2 md:py-3 font-medium text-center transition-colors duration-200 ${activeRange === 1 ? 'switch-bar__button--active text-black' : 'text-gray-500'}`}
@@ -100,10 +108,24 @@ const SectionPointPro = () => {
                                 {/* Débito */}
                                 <div className="values__box flex-1 text-center">
                                     <div className="values__value flex items-end justify-center">
-                                        <span className="values__flip text-3xl md:text-4xl font-semibold">
-                                            {taxRanges[activeRange].debito}
-                                        </span>
-                                        <span className="values__percent text-xl md:text-2xl ml-1 font-semibold">%</span>
+                                        {/* se a taxa for promo, o texto é verde  */}
+                                        {activeRange === 0 ? (
+                                            <span className="values__flip text-3xl md:text-4xl font-semibold text-emerald-600">
+                                                {taxRanges[activeRange].debito}
+                                            </span>
+                                            
+                                        ) : (
+                                            <span className="values__flip text-3xl md:text-4xl font-semibold">
+                                                {taxRanges[activeRange].debito}
+                                            </span>
+                                        )}
+                                        {activeRange === 0 ? (
+                                            <span className="values__percent text-xl md:text-2xl ml-1 font-semibold text-emerald-600">%</span>
+                                        ) : (
+                                            <span className="values__percent text-xl md:text-2xl ml-1 font-semibold">%</span>
+                                        )}
+
+                                        
                                     </div>
                                     <span className="values__label text-xs font-medium uppercase text-gray-600 mt-1 block">DÉBITO</span>
                                 </div>
@@ -111,10 +133,22 @@ const SectionPointPro = () => {
                                 {/* Crédito */}
                                 <div className="values__box flex-1 text-center">
                                     <div className="values__value flex items-end justify-center">
-                                        <span className="values__flip text-3xl md:text-4xl font-semibold">
-                                            {taxRanges[activeRange].credito}
-                                        </span>
-                                        <span className="values__percent text-xl md:text-2xl ml-1 font-semibold">%</span>
+                                        {/* se a taxa for promo, o texto é verde  */}
+                                        {activeRange === 0 ? (
+                                            <span className="values__flip text-3xl md:text-4xl font-semibold text-emerald-600">
+                                                {taxRanges[activeRange].credito}
+                                            </span>
+                                        ) : (
+                                            <span className="values__flip text-3xl md:text-4xl font-semibold">
+                                                {taxRanges[activeRange].credito}
+                                            </span>
+                                        )}
+                                        {activeRange === 0 ? (
+                                            <span className="values__percent text-xl md:text-2xl ml-1 font-semibold text-emerald-600">%</span>
+                                        ) : (
+                                            <span className="values__percent text-xl md:text-2xl ml-1 font-semibold">%</span>
+                                        )}
+
                                     </div>
                                     <span className="values__label text-xs font-medium uppercase text-gray-600 mt-1 block">CRÉDITO</span>
                                 </div>
@@ -122,10 +156,20 @@ const SectionPointPro = () => {
                                 {/* Crédito 12x */}
                                 <div className="values__box flex-1 text-center">
                                     <div className="values__value flex items-end justify-center">
-                                        <span className="values__flip text-3xl md:text-4xl font-semibold">
-                                            {taxRanges[activeRange].credito12x}
-                                        </span>
-                                        <span className="values__percent text-xl md:text-2xl ml-1 font-semibold">%</span>
+                                        {/* se a taxa for promo, o texto é verde  */}
+                                        {activeRange === 0 ? (
+                                            <span className="values__flip text-3xl md:text-4xl font-semibold text-emerald-600">
+                                                {taxRanges[activeRange].credito12x}
+                                            </span>
+                                        ) : (
+                                            <span className="values__flip text-3xl md:text-4xl font-semibold">  {taxRanges[activeRange].credito12x}</span>
+                                        )}
+                                        {activeRange === 0 ? (
+                                            <span className="values__percent text-xl md:text-2xl ml-1 font-semibold text-emerald-600">%</span>
+                                        ) : (
+                                            <span className="values__percent text-xl md:text-2xl ml-1 font-semibold">%</span>
+                                        )}
+
                                     </div>
                                     <span className="values__label text-xs font-medium uppercase text-gray-600 mt-1 block">CRÉDITO 12x</span>
                                 </div>
@@ -149,7 +193,10 @@ const SectionPointPro = () => {
                             </div>
                             
                             <div style={{ color: 'rgba(0, 0, 0, 0.55)', fontSize: '12px', marginTop: '10px', textAlign: 'left', lineHeight: '16px' }}>
-                                <p>Taxas para quem nunca usou o Mercado Pago ou que não vende há 12 meses com Point.</p>
+                              
+                                <p>
+                                Promoção para novos usuários: Ao adquirir uma maquininha Point, o usuário aproveita taxas promocionais nos primeiros 30 dias ou até R$ 5.000 em vendas (o que ocorrer primeiro)
+                                </p>
                             </div>
                         </div>
                     </div>

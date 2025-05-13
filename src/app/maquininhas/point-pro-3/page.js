@@ -1,7 +1,6 @@
 import React from 'react';
 import CardFlag from '../../../components/CardFlag';
 
-import SectionCredito from '../../../components/SectionCredito';
 import SectionLinkVendas from '../../../components/SectionLinkVendas';
 import TestimonialSlider from '../../../components/TestimonialSlider';
 import HeroSectionPointPro from '../../../components/points/HeroSectionPointPro';
@@ -10,6 +9,7 @@ import SectionPointPro from '../../../components/points/SectionPointPro';
 import MenuPopover from '../../../components/MenuPopover';
 import SectionAboutPointPro from '../../../components/points/SectionAboutPointPro';
 import ConhecaPointPro3 from '../../../components/ConhecaPointPro3';
+import SectionConta from '../../../components/SectionConta';
 
 export default function Home() {
   return (
@@ -22,7 +22,7 @@ export default function Home() {
       <SectionAboutPointPro />
       
       <ConhecaPointPro3 />
-      <SectionCredito />
+      <SectionConta />
       <SectionLinkVendas />
       <TestimonialSlider />
       <section className="relative  transition duration-500  bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%]">

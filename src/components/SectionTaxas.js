@@ -4,47 +4,78 @@ import { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react'; // Assuming lucide-react is installed
 import { useTaxasModal } from '../contexts/TaxasModalContext';
 
-// AnimatedNumber Component - Logic unchanged, styles updated to Tailwind
+// AnimatedNumber Component - modificado para efeito de contador digital
 const AnimatedNumber = ({ value }) => {
     const [displayValue, setDisplayValue] = useState(value);
     const previousValue = useRef(value);
-    const [animating, setAnimating] = useState(false);
-    const [transitioning, setTransitioning] = useState(false);
-    const [direction, setDirection] = useState('up'); // 'up' ou 'down'
-
+    const countRef = useRef(null);
+    
     useEffect(() => {
         if (value !== previousValue.current) {
-            const currentValueFloat = parseFloat(value?.replace(',', '.') ?? '0');
-            const previousValueFloat = parseFloat(previousValue.current?.replace(',', '.') ?? '0');
-            const newDirection = currentValueFloat > previousValueFloat ? 'up' : 'down';
-            setDirection(newDirection);
-            setTransitioning(true);
-            setAnimating(true);
-            setTimeout(() => {
+            // Limpar qualquer contagem anterior
+            if (countRef.current) {
+                clearInterval(countRef.current);
+            }
+            
+            // Converter os valores para números
+            const startValue = parseFloat(previousValue.current?.replace(',', '.') || '0');
+            const targetValue = parseFloat(value?.replace(',', '.') || '0');
+            
+            // Se os valores forem iguais, não precisamos animar
+            if (startValue === targetValue) {
                 setDisplayValue(value);
-                setTransitioning(false);
-                setTimeout(() => {
-                    setAnimating(false);
+                previousValue.current = value;
+                return;
+            }
+            
+            // Configurações da animação
+            const steps = 20; // Número de etapas
+            const interval = 25; // Intervalo em ms
+            
+            // Para valores decimais (multiplicamos para trabalhar com inteiros)
+            const multiplier = 100;
+            const startValueInt = Math.round(startValue * multiplier);
+            const targetValueInt = Math.round(targetValue * multiplier);
+            const increment = Math.max(1, Math.ceil(Math.abs(targetValueInt - startValueInt) / steps));
+            
+            let currentValue = startValueInt;
+            let step = 0;
+            const isIncreasing = targetValue > startValue;
+            
+            // Iniciar a animação de contagem
+            countRef.current = setInterval(() => {
+                step++;
+                
+                // Incrementar ou decrementar o valor
+                if (isIncreasing) {
+                    currentValue = Math.min(targetValueInt, currentValue + increment);
+                } else {
+                    currentValue = Math.max(targetValueInt, currentValue - increment);
+                }
+                
+                // Formatar o valor atual
+                const decimal = (currentValue / multiplier).toFixed(2);
+                const formatted = decimal.replace('.', ',').replace(/,?0+$/, '');
+                
+                setDisplayValue(formatted);
+                
+                // Finalizar quando atingir o alvo
+                if (currentValue === targetValueInt || step >= steps) {
+                    clearInterval(countRef.current);
+                    setDisplayValue(value);
                     previousValue.current = value;
-                }, 300);
-            }, 300);
+                }
+            }, interval);
+            
+            return () => {
+                if (countRef.current) {
+                    clearInterval(countRef.current);
+                }
+            };
         }
     }, [value]);
-
-    return (
-        <div className="relative flex justify-center overflow-hidden h-full">
-            <div
-                className={`absolute inset-0 transition-all duration-300 text-center flex items-center justify-center
-                    ${animating ? 
-                        (transitioning ? 
-                            (direction === 'up' ? 'translate-y-full opacity-0' : '-translate-y-full opacity-0') : 
-                            (direction === 'up' ? '-translate-y-full opacity-0' : 'translate-y-full opacity-0')) : 
-                        'translate-y-0 opacity-100'}`}
-            >
-                {displayValue}
-            </div>
-        </div>
-    );
+    
+    return <span>{displayValue}</span>;
 };
 
 // Componente separado para o modal de taxas
@@ -196,6 +227,13 @@ export const TaxasModal = () => {
                             </div>
                         </div>
                     </div>
+                    
+                    {/* Aviso de promoção no modal */}
+                    <div className="mt-6 pt-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-600 text-center">
+                            Promoção para novos usuários: Ao adquirir uma maquininha Point, o usuário aproveita taxas promocionais nos primeiros 30 dias ou até R$ 5.000 em vendas (o que ocorrer primeiro)
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -210,12 +248,16 @@ const SectionTaxas = () => {
 
     // Ajustando as taxas para corresponder à imagem
     const taxRanges = [
+        //taxa promocional
+        { debito: '0,74', credito: '0,74', credito12x: '8,99' },
         { debito: '1,99', credito: '4,98', credito12x: '22,59' },
         { debito: '1,67', credito: '3,57', credito12x: '13,99' },
         { debito: '1,65', credito: '3,55', credito12x: '13,79' },
     ];
 
     const rangeLabels = [
+        'Promo',
+
         'Até R$ 2 mil',
         'Até R$ 5 mil',
         'Mais de R$ 5 mil'
@@ -245,31 +287,62 @@ const SectionTaxas = () => {
                 <div className="max-w-3xl mx-auto">
                     {/* Selector de faixas */}
                     <div className="flex justify-center mb-6">
-                        <div className="grid grid-cols-3 bg-gray-100 rounded-full overflow-hidden w-full max-w-md shadow-sm  border">
+                        <div className="grid grid-cols-4 bg-gray-100 rounded-full overflow-hidden w-full max-w-md shadow-sm  border">
                             {rangeLabels.map((label, index) => (
                                 <button 
                                     key={index}
                                     onClick={() => handleRangeClick(index)}
                                     className={`py-2 text-sm font-medium transition-colors duration-200 ${activeRange === index ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-700'}`}
                                 >
-                                    {label}
+                                   
+                                    {label === 'Promo' ? (
+                                        <span className="font-bold text-emerald-600">{label}</span>
+                                    ) : (
+                                        label
+                                    )}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {/* Valores de taxas */}
+                                
+                    
                     <div className="flex justify-center items-center gap-16 sm:gap-20 mb-8 text-center">
-                        {['DÉBITO', 'CRÉDITO', 'CRÉDITO 12x'].map((label, idx) => (
-                            <div key={label}>
-                                <div className="text-2xl md:text-3xl font-bold mb-1 flex items-end justify-center">
-                                    <span>{taxRanges[activeRange][idx === 0 ? 'debito' : idx === 1 ? 'credito' : 'credito12x']}</span>
-                                    <span className="ml-0.5 text-xl md:text-2xl">%</span>
+                        {['DÉBITO', 'CRÉDITO', 'CRÉDITO 12x'].map((label) => {
+                            const currentTaxObject = taxRanges[activeRange];
+                            let taxValue;
+
+                            if (label === 'DÉBITO') {
+                                taxValue = currentTaxObject.debito;
+                            } else if (label === 'CRÉDITO') {
+                                taxValue = currentTaxObject.credito;
+                            } else if (label === 'CRÉDITO 12x') {
+                                taxValue = currentTaxObject.credito12x;
+                            }
+
+                            const isPromo = activeRange === 0; // 'Promo' é o índice 0
+
+                            return (
+                                <div key={label}>
+                                    <div className="text-2xl md:text-3xl font-bold mb-1 flex items-end justify-center">
+                                        <span className={isPromo ? "text-emerald-600" : "text-gray-900"}>
+                                            <AnimatedNumber value={taxValue} />
+                                        </span>
+                                        <span className={`ml-2 text-xl md:text-2xl ${isPromo ? "text-emerald-600" : "text-gray-900"}`}>%</span>
+                                    </div>
+                                    <span className="block text-xs font-semibold text-gray-700 uppercase">{label}</span>
                                 </div>
-                                <span className="block text-xs font-semibold text-gray-700 uppercase">{label}</span>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
+                    
+                    {/* Aviso de promoção */}
+                    <div className="max-w-lg mx-auto text-center">
+                        <p className="text-xs text-gray-600 mt-2 mb-4">
+                            Promoção para novos usuários: Ao adquirir uma maquininha Point, o usuário aproveita taxas promocionais nos primeiros 30 dias ou até R$ 5.000 em vendas (o que ocorrer primeiro)
+                        </p>
+                    </div>
+                   
                 </div>
             </div>
 

@@ -63,7 +63,7 @@ const HeroSectionPointSmart = () => {
                             height={450}
                             decoding="async"
                             data-nimg="1"
-                            className="object-contain"
+                            className="object-contain animate-float"
                             src="/images/point/device-28-1.webp"
                             style={{ color: 'transparent' }}
                         />

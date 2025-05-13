@@ -12,6 +12,15 @@ module.exports = {
       fontFamily: {
         inter: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
+      animation: {
+        float: 'float 8s ease-in-out infinite',
+    },
+    keyframes: {
+        float: {
+            '0%, 100%': { transform: 'translateY(0) ' },
+            '50%': { transform: 'translateY(-10px) ' },
+        },
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -25,6 +34,9 @@ module.exports = {
       backgroundColor: {
         'secondary/80': 'hsl(var(--secondary) / 0.8)',
       },
+      backgroundImage: {
+        'gradient-28': 'linear-gradient(to bottom, #FFE600 0%, #FFD400 28%)',
+      }
     },
   },
   plugins: [],
