@@ -260,7 +260,7 @@ const SectionTaxas = () => {
 
         'Até R$ 2 mil',
         'Até R$ 5 mil',
-        'Mais de R$ 5 mil'
+        '+ R$ 5 mil'
     ];
 
     const handleRangeClick = (index) => {
