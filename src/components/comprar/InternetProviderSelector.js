@@ -1,17 +1,65 @@
 'use client'
-const InternetProviderSelector = ({ selectedProvider, onProviderChange }) => {
-  const providers = [
+const InternetProviderSelector = ({ selectedProvider, onProviderChange, availableProviders = [] }) => {
+  const allProviders = [
       { id: '36', name: 'Chip Vivo', description: 'Plano de dados grátis', logo: '/chips/vivo.png', recommended: true },
       { id: '23', name: 'Chip Claro', description: 'Plano de dados grátis', logo: '/chips/claro.png' },
       { id: '32', name: 'Chip TIM', description: 'Plano de dados grátis', logo: '/chips/tim.png' },
   ];
+  
+  // Mapear os IDs para nomes para facilitar a comparação
+  const providerIdToName = {
+    '36': 'vivo',
+    '23': 'claro',
+    '32': 'tim'
+  };
+  
+  console.log('Available providers from API:', availableProviders);
+  console.log('Currently selected provider:', selectedProvider);
+  
+  // Filtrar operadoras disponíveis com uma lógica simples
+  const filteredProviders = allProviders.filter(provider => {
+    // Se não houver providers disponíveis, mostrar todos
+    if (!availableProviders || availableProviders.length === 0) {
+      return true;
+    }
+    
+    // Obter o nome normalizado da operadora atual
+    const providerName = providerIdToName[provider.id].toLowerCase();
+    
+    // Verificar se existe alguma operadora disponível com este nome
+    const isAvailable = availableProviders.some(ap => 
+      ap.name.toLowerCase() === providerName
+    );
+    
+    console.log(`Provider ${provider.id} (${providerName}): Available = ${isAvailable}`);
+    
+    return isAvailable;
+  });
+  
+  console.log('Filtered providers:', filteredProviders);
+  
+  // Verificar se o provedor selecionado está na lista de provedores filtrados
+  const isSelectedProviderAvailable = filteredProviders.some(
+    provider => provider.id === selectedProvider
+  );
+  
+  console.log('Is selected provider available?', isSelectedProviderAvailable);
+  
+  // Se o provedor selecionado não estiver disponível e houver provedores filtrados,
+  // selecionar automaticamente o primeiro provedor disponível
+  if (!isSelectedProviderAvailable && filteredProviders.length > 0) {
+    console.log('Auto-selecting first available provider:', filteredProviders[0].id);
+    setTimeout(() => {
+      onProviderChange(filteredProviders[0].id);
+    }, 0);
+  }
 
   return (
       <div className="max-w-3xl mx-auto bg-white overflow-hidden">
           <h2 className="text-lg font-medium p-4">Escolha um provedor de internet para a sua Point</h2>
-          <p className="text-sm text-gray-400 px-4 py-2">Estas são as recomendações de conexão com a internet para o seu endereço salvo.</p>
+          <p className="text-sm text-gray-400 px-4 py-2">Estas são as opções de conexão com a internet disponíveis para este modelo.</p>
           <ul className="divide-y divide-gray-200 shadow-lg rounded-lg border">
-              {providers.map((provider) => (
+              {filteredProviders.map((provider) => (
                   <li
                       key={provider.id}
                       className={`flex items-center p-4 ${selectedProvider === provider.id ? 'bg-gray-50' : ''}`}

@@ -16,17 +16,17 @@ export default function Home() {
     <div className="w-screen m-0 p-0">
       <MenuPopover /> 
       <HeroSectionPointAir />
-      <CardFlag />
       <SectionTaxas />
+      <CardFlag />
       <SectionNovaAir />
       <SectionPointAir />
       <SectionConta />
       <SectionCredito />
       <SectionLinkVendas />
       <TestimonialSlider />
-      <section className="relative bg-brand transition duration-500 dark:bg-brand-dark">
+      <section className="relative  bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%] transition duration-500 ">
         <div className="card container py-24 text-center">
-          <h2 className="text-xl font-bold uppercase text-white sm:text-2xl">Crescer só depende de você</h2>
+          <h2 className="text-xl font-bold uppercase text-black sm:text-2xl">Crescer só depende de você</h2>
           <a href="/comprar/point-air" className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker">Comprar Point Air</a>
         </div>
       </section>

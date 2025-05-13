@@ -24,12 +24,12 @@ const productData = [
     ]
   },
   {
-    name: "Point Pro 2",
+    name: "Point Pro 3",
     normalPrice: "718,80",
     price: "89,99",
     imageUrl: "/images/devices/device-pro.webp",
-    urlBuy: "/comprar/point-pro-2",
-    urlInfo: "/maquininhas/point-pro-2",
+    urlBuy: "/comprar/point-pro-3",
+    urlInfo: "/maquininhas/point-pro-3",
     info: "Bateria que dura o dia todo",
     linkOperadoras:[
       {name: "Vivo", url: "https://enoc-maquininhas-br.mycartpanda.com/checkout/21840125:1"},

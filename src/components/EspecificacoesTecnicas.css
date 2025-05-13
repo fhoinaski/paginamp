@@ -1,0 +1,190 @@
+.calm-landings-library-section-wrapper {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.inner-section-wrapper {
+  background: unset;
+  padding: 56px 90px;
+  border-radius: 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.row-title {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  width: 100%;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.icon {
+  color: #1a1a1a;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spec-content {
+  width: 100%;
+}
+
+.spec-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.spec-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.spec-prop {
+  font-size: 0.9rem;
+  color: #4a4a4a;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+@media (max-width: 1200px) {
+  .inner-section-wrapper {
+    padding: 50px 60px;
+  }
+}
+
+@media (max-width: 992px) {
+  .inner-section-wrapper {
+    padding: 40px;
+  }
+  
+  .row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  
+  .title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .inner-section-wrapper {
+    padding: 32px 24px;
+  }
+  
+  .rows {
+    gap: 32px;
+  }
+  
+  .row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .column {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+}
+
+@media (max-width: 576px) {
+  .inner-section-wrapper {
+    padding: 24px 16px;
+    border-radius: 20px;
+  }
+  
+  .rows {
+    gap: 16px;
+  }
+  
+  .row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .column {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 14px;
+  }
+  
+  .spec-content {
+    flex: 1;
+  }
+  
+  .spec-title {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  
+  .spec-prop {
+    font-size: 0.85rem;
+  }
+  
+  .icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 380px) {
+  .column {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .spec-title {
+    font-size: 0.9rem;
+  }
+  
+  .spec-prop {
+    font-size: 0.8rem;
+  }
+} 

@@ -1,4 +1,94 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Maquininhas Point
+
+Este é um projeto de e-commerce para venda de maquininhas de cartão, desenvolvido com Next.js, React e TypeScript.
+
+## 🚀 Tecnologias
+
+- Next.js 14
+- React 18
+- TypeScript
+- Tailwind CSS
+- ESLint
+- Prettier
+- MongoDB
+
+## 📦 Estrutura do Projeto
+
+```
+src/
+├── app/                 # Rotas e páginas da aplicação
+├── components/         # Componentes React reutilizáveis
+│   ├── ui/            # Componentes de UI básicos
+│   └── layout/        # Componentes de layout
+├── hooks/             # Hooks personalizados
+├── services/          # Serviços e integrações
+├── types/             # Definições de tipos TypeScript
+└── utils/             # Funções utilitárias
+    ├── constants/     # Constantes e configurações
+    └── helpers/       # Funções auxiliares
+```
+
+## 🛠️ Instalação
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/maquininhas-point.git
+cd maquininhas-point
+```
+
+2. Instale as dependências:
+```bash
+npm install
+```
+
+3. Configure as variáveis de ambiente:
+```bash
+cp .env.example .env.local
+```
+
+4. Inicie o servidor de desenvolvimento:
+```bash
+npm run dev
+```
+
+## 🏗️ Arquitetura
+
+O projeto segue uma arquitetura baseada em componentes, com separação clara de responsabilidades:
+
+- **Componentes**: Divididos em UI (básicos) e Layout (estruturais)
+- **Hooks**: Lógica reutilizável e gerenciamento de estado
+- **Serviços**: Integrações com APIs e serviços externos
+- **Utils**: Funções utilitárias e constantes
+- **Types**: Definições de tipos TypeScript
+
+### Padrões de Código
+
+- Componentes funcionais com hooks
+- TypeScript para tipagem estática
+- ESLint e Prettier para padronização
+- Testes unitários com Jest
+- Documentação com JSDoc
+
+## 📝 Scripts Disponíveis
+
+- `npm run dev`: Inicia o servidor de desenvolvimento
+- `npm run build`: Gera a build de produção
+- `npm start`: Inicia o servidor de produção
+- `npm run lint`: Executa o linter
+- `npm run format`: Formata o código
+- `npm test`: Executa os testes
+
+## 🤝 Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## Getting Started
 

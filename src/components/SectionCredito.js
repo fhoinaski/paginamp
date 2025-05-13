@@ -11,7 +11,15 @@ const SectionCredito = () => {
         </div>
         <div className="row-start-2 self-center sm:col-start-2 sm:row-start-1 sm:row-end-3">
         <Image
-         alt="loan" loading="lazy" width="500" height="500" decoding="async" data-nimg="1" style="color:transparent" src="/images/loan.webp"/>
+          alt="loan" 
+          loading="lazy" 
+          width={500} 
+          height={500} 
+          decoding="async" 
+          data-nimg="1" 
+          style={{ color: "transparent" }} 
+          src="/images/loan.webp"
+        />
         </div>
           
         </div>

@@ -36,7 +36,7 @@ const TestimonialSlider = () => {
 
   useEffect(() => {
     if (isAnimating) {
-      const timer = setTimeout(() => setIsAnimating(false), 500); // 500ms matches the CSS transition duration
+      const timer = setTimeout(() => setIsAnimating(false), 500);
       return () => clearTimeout(timer);
     }
   }, [isAnimating]);
@@ -45,7 +45,7 @@ const TestimonialSlider = () => {
     if (!isAnimating) {
       setDirection('right');
       setIsAnimating(true);
-      setCurrentIndex((prevIndex) => 
+      setCurrentIndex((prevIndex) =>
         prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
       );
     }
@@ -55,7 +55,7 @@ const TestimonialSlider = () => {
     if (!isAnimating) {
       setDirection('left');
       setIsAnimating(true);
-      setCurrentIndex((prevIndex) => 
+      setCurrentIndex((prevIndex) =>
         prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
       );
     }
@@ -67,12 +67,20 @@ const TestimonialSlider = () => {
     <section className="bg-primary-foreground dark:bg-primary-foreground/30">
       <div className="card container py-16">
         <div className="relative rounded-xl border bg-white p-8 shadow-xl shadow-black/5 dark:bg-accent/60 dark:shadow-black/30 sm:px-16 sm:py-12 overflow-hidden">
-          <div 
-            className={`testimonial-slide ${isAnimating ? `slide-${direction}` : ''}`}
+          <div
+            className="testimonial-slide"
+            style={{
+              transform: isAnimating
+                ? direction === 'left'
+                  ? 'translateX(100%)'
+                  : 'translateX(-100%)'
+                : 'translateX(0)',
+              transition: isAnimating ? 'transform 0.5s ease-in-out' : 'none',
+            }}
           >
             <div className="flex flex-col items-center gap-8 sm:flex-row md:gap-12">
               <div className="h-36 w-36 shrink-0 md:h-[220px] md:w-[220px]">
-                <Image 
+                <Image
                   src={currentTestimonial.image}
                   alt={currentTestimonial.name}
                   width={220}
@@ -100,49 +108,52 @@ const TestimonialSlider = () => {
               </div>
             </div>
           </div>
-          <button 
-            type="button" 
-            aria-label="previous slide" 
+          <button
+            type="button"
+            aria-label="previous slide"
             className="navigation slide-prev absolute left-4 top-1/2 transform -translate-y-1/2"
             onClick={handlePrev}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-arrow-left"
+            >
               <path d="m12 19-7-7 7-7"></path>
               <path d="M19 12H5"></path>
             </svg>
           </button>
-          <button 
-            type="button" 
-            aria-label="next slide" 
+          <button
+            type="button"
+            aria-label="next slide"
             className="navigation slide-next absolute right-4 top-1/2 transform -translate-y-1/2"
             onClick={handleNext}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-arrow-right"
+            >
               <path d="M5 12h14"></path>
               <path d="m12 5 7 7-7 7"></path>
             </svg>
           </button>
         </div>
       </div>
-      <style jsx>{`
-        .testimonial-slide {
-          transition: transform 0.5s ease-in-out;
-        }
-        .slide-left {
-          animation: slideLeft 0.5s forwards;
-        }
-        .slide-right {
-          animation: slideRight 0.5s forwards;
-        }
-        @keyframes slideLeft {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-        @keyframes slideRight {
-          from { transform: translateX(-100%); }
-          to { transform: translateX(0); }
-        }
-      `}</style>
     </section>
   );
 };

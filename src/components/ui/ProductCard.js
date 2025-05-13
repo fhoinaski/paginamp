@@ -2,18 +2,11 @@ import React from 'react';
 import { BellRing } from 'lucide-react';
 import { FaBatteryFull, FaWifi, FaCreditCard, FaShieldAlt, FaPrint, FaSimCard, FaRulerCombined, FaWeight } from 'react-icons/fa';
 import Image from 'next/image';
+import { ICON_MAPPING } from '../../utils/constants/icons';
+import { calculateDiscount } from '../../utils/helpers/format';
+import Price from './Price';
 
-// const iconMapping = {
-//     "bateria": <FaBatteryFull className="mr-2 text-sky-500" />,
-//     "wifi": <FaWifi className="mr-2 text-sky-500" />,
-//     "débito, crédito, código QR e Pix": <FaCreditCard className="mr-2 text-sky-500" />,
-//     "conta digital e cartão gratuito": <FaShieldAlt className="mr-2 text-sky-500" />,
-//     "garantia": <FaShieldAlt className="mr-2 text-sky-500" />,
-//     "Imprime o comprovante": <FaPrint className="mr-2 text-sky-500" />,
-//     "Cartão com chip, tarja magnética e por aproximação": <FaSimCard className="mr-2 text-sky-500" />,
-//     "dimensões": <FaRulerCombined className="mr-2 text-sky-500" />,
-//     "peso": <FaWeight className="mr-2 text-sky-500" />
-//   };
+
 
 const iconMapping = {
     "bateria": (
@@ -89,7 +82,7 @@ const calcularDesconto = (precoNormal, precoVenda) => {
   };
 
 const ProductCard = ({ product }) => {
-    const desconto = calcularDesconto(product.normalPrice, product.price);
+    const desconto = calculateDiscount(product.normalPrice, product.price);
 
     return (
         <div id="modelos" className="card relative rounded-lg rounded-tl-xl border bg-white p-4 pt-10 shadow z-10">
@@ -136,7 +129,7 @@ const ProductCard = ({ product }) => {
 
             {/* Conteúdo do Produto */}
             <div className="relative flex gap-4 lg:block">
-            {product.name.toLowerCase().includes('smart') && (
+            {product.name.toLowerCase().includes('pro 3') && (
         <div className="absolute left-0 top-0 flex items-center gap-1 rounded-br-md rounded-tl-md bg-rose-500 px-2 py-0.5 text-xs font-medium text-white lg:rounded">
           <BellRing size={14} />
           <span className="">NOVA</span>
@@ -157,7 +150,11 @@ const ProductCard = ({ product }) => {
                         <h2 className="text-lg font-semibold leading-tight">{product.name}</h2>
                         <p className="text-sm text-gray-500">{product.info}</p>
                     </div>
-                    <div className="flex flex-col"><span className="text-muted-foreground line-through lg:text-lg">R$&nbsp;{product.normalPrice}</span><span className="text-lg font-semibold lg:text-2xl">R$&nbsp;{product.price}</span></div>
+                    <Price 
+                        price={`R$ ${product.price}`}
+                        normalPrice={`R$ ${product.normalPrice}`}
+                        className="flex flex-col"
+                    />
                 </div>
             </div>
                 <a href={product.urlBuy} className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 mt-5 h-12 w-full text-base">Comprar agora</a>
@@ -178,7 +175,7 @@ const ProductCard = ({ product }) => {
                 <ul className="mr-2 flex flex-col gap-3">
                     {product.specifications.map((spec, index) => (
                         <li key={index} className="flex items-center">
-                            {iconMapping[spec.type] } {/* Ícone antes da especificação */}
+                            {ICON_MAPPING[spec.type] } {/* Ícone antes da especificação */}
                             <span className='ml-3 text-sm leading-tight'>{spec.text}</span>
                         </li>
                     ))}

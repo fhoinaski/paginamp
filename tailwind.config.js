@@ -4,6 +4,9 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}", // Ajuste para incluir todos os arquivos relevantes
+  ],
   theme: {
     extend: {
       fontFamily: {

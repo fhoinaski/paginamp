@@ -4,19 +4,19 @@ import { CreditCard, Banknote, CalendarX } from 'lucide-react';
 
 const MercadoPagoHero = () => {
   return (
-    <section className="relative bg-gradient-to-b from-[#068ee4] to-[#020b7c] pb-24 pt-8 md:pt-12 m-0">
+    <section className="relative bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%] pb-24 pt-8 md:pt-12 m-0">
       <div className="container mx-auto grid grid-cols-1 gap-8 md:grid-cols-2  ">
         <div className="flex flex-col  gap-4 text-center md:items-start md:justify-center md:text-left max-w-[480px] ">
-        <div className="inline-flex items-center border rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-brand border-transparent hover:bg-brand/80 uppercase text-white max-w-[200px] justify-center mx-auto md:mx-0">
+        <div className="inline-flex items-center border rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent  uppercase text-black max-w-[200px] justify-center mx-auto md:mx-0">
             Mercado Pago Point
           </div>
-          <h1 className="text-2xl font-black uppercase leading-tight text-white sm:text-2xl md:text-4xl">
+          <h1 className="text-2xl font-black uppercase leading-tight text-black sm:text-2xl md:text-4xl mt-4">
             Escolha a maquininha perfeita para o seu negócio
           </h1>
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-10">
           <Image
-            src="/images/herotaxas.png"
+            src="/images/hero.webp"
             alt="hero-image"
             width={450}
             height={450}
@@ -25,7 +25,7 @@ const MercadoPagoHero = () => {
           />
         </div>
       </div>
-      <ul className="container mx-auto flex flex-wrap justify-center gap-x-8 gap-y-3 pt-8 text-sm leading-tight text-white">
+      <ul className="container mx-auto flex flex-wrap justify-center gap-x-8 gap-y-3 pt-8 text-sm leading-tight text-black">
         <FeatureItem icon={<CreditCard />} text="Conta digital e cartão gratuito" />
         <FeatureItem icon={<Banknote />} text="Dinheiro na hora" />
         <FeatureItem icon={<CreditIcon />} text="Crédito na hora sob medida" />

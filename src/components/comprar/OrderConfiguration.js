@@ -1,18 +1,33 @@
 import { ChevronDownIcon, TagIcon } from 'lucide-react';
+import { formatCurrency } from '../../utils/formatters';
 
-const OrderConfiguration = ({ price, name, imageUrl, normalPrice }) => {
-    const desconto = parseFloat(normalPrice) - parseFloat(price);
+const OrderConfiguration = ({ product }) => {
+    if (!product) return null;
 
-
+    const { name, imageUrl, price, normalPrice } = product;
+    
+    // Converter para números
+    const priceNum = parseFloat(price?.replace(',', '.') || 0);
+    const normalPriceNum = parseFloat(normalPrice?.replace(',', '.') || 0);
+    
+    // Calcular desconto
+    const discount = normalPriceNum > priceNum ? normalPriceNum - priceNum : 0;
+    const discountPercentage = normalPriceNum > 0 
+        ? Math.round((1 - priceNum / normalPriceNum) * 100) 
+        : 0;
 
     return (
-        <div className="max-w-3xl mx-auto bg-white  overflow-hidden">
-            <h2 className="text-xl font-medium p-4 ">Configure o seu pedido</h2>
+        <div className="max-w-3xl mx-auto bg-white overflow-hidden rounded-lg shadow">
+            <h2 className="text-xl font-medium p-4">Configure o seu pedido</h2>
 
             <div className="p-4">
                 <div className="bg-emerald-500 text-white p-2 rounded-t-lg flex items-center justify-center">
                     <TagIcon className="w-5 h-5 mr-2" />
-                    <span className="font-extralight text-sm">Preço especial</span>
+                    <span className="font-extralight text-sm">
+                        {discountPercentage > 0 
+                            ? `${discountPercentage}% de desconto` 
+                            : "Preço especial"}
+                    </span>
                 </div>
 
                 <div className="flex items-center p-4 bg-white rounded-b-lg border border-t-0 border-gray-200">
@@ -22,21 +37,21 @@ const OrderConfiguration = ({ price, name, imageUrl, normalPrice }) => {
                         className="w-24 h-auto mr-6"
                     />
                     <div className="flex-grow flex flex-col gap-4 md:flex-row lg:flex-row xl:flex-row sm:flex-row justify-between">
-                        <div className='flex flex-col '>
+                        <div className='flex flex-col'>
                             <h3 className="text-lg font-medium mb-2">{name}</h3>
-                            <div className=''>
-                            <span className='text-[0.6rem]' >Preço:</span>
-                                <p className="text-gray-500 text-xs ">
-                                    <s>R$: {normalPrice}</s>
-                                    
-                                </p>
-                            </div>
+                            {normalPriceNum > 0 && (
+                                <div>
+                                    <span className='text-[0.6rem]'>Preço:</span>
+                                    <p className="text-gray-500 text-xs">
+                                        <s>R$: {normalPrice}</s>
+                                    </p>
+                                </div>
+                            )}
                           
-                            <span className=''></span>
                             <div className='mt-4'>
-                                <span className='text-[0.6rem]' >Você Paga:</span>
-                                <p className='text-xl font-semibold font-inter  '>R$: {price}
-                                
+                                <span className='text-[0.6rem]'>Você Paga:</span>
+                                <p className='text-xl font-semibold font-inter'>
+                                    R$: {price}
                                 </p>
                             </div>
                             
