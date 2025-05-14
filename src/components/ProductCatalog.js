@@ -65,6 +65,18 @@ const ProductCatalog = () => {
     setFilteredProducts(result);
   }, [searchTerm, products, priceRange, sortOption]);
 
+  // TODO: Otimização futura para escalabilidade
+  // Para otimização e escalabilidade com grande número de produtos:
+  // 1. Implementar paginação, filtragem (searchTerm, priceRange) e ordenação (sortOption)
+  //    diretamente na API (/api/products?page=1&limit=12&search=termo&minPrice=0&maxPrice=1000&sort=price-asc)
+  // 2. O frontend então passaria esses parâmetros para a API e receberia apenas 
+  //    o conjunto de dados relevante e paginado.
+  // 3. Isso reduziria:
+  //    - A carga no cliente (filtragem e ordenação feita no servidor)
+  //    - A quantidade de dados transferidos pela rede
+  //    - O consumo de memória no cliente
+  // 4. Implemente também indexação adequada no MongoDB para os campos de filtro e ordenação
+
   return (
     <section className="-mt-24 bg-primary-foreground dark:bg-slate-900 transition-colors">
       <div className="container mx-auto px-4 py-8">

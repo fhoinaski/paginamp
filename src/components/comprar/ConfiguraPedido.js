@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import InternetProviderSelector from "./InternetProviderSelector";
 import OrderConfiguration from "./OrderConfiguration";
 import { Check, ChevronRight, ExternalLink } from 'lucide-react';
+import { trackInitiateCheckout, isPixelReady } from '../../lib/fbPixel';
 
 const ConfiguraPedido = ({ product }) => {
     const [selectedProvider, setSelectedProvider] = useState('36'); // Default to Vivo
@@ -128,6 +129,43 @@ const ConfiguraPedido = ({ product }) => {
 
     const nextStep = () => {
         if (currentStep === 1) {
+            // Disparar evento InitiateCheckout quando o usuário prossegue para o pagamento
+            if (product) {
+                // Tenta rastrear o evento do FB Pixel
+                if (isPixelReady()) {
+                    trackInitiateCheckout(product);
+                    console.log(`Evento InitiateCheckout para ${product.name} rastreado com sucesso em ConfiguraPedido.`);
+                } else {
+                    console.warn('FB Pixel não estava pronto para InitiateCheckout em ConfiguraPedido. Tentando novamente...');
+                    // Tenta novamente após um pequeno delay
+                    setTimeout(() => {
+                        if (isPixelReady()) {
+                            trackInitiateCheckout(product);
+                            console.log(`Evento InitiateCheckout para ${product.name} rastreado após retry em ConfiguraPedido.`);
+                        }
+                    }, 500);
+                }
+                
+                // TikTok Pixel continua como antes
+                if (typeof ttq === 'object' && ttq.track) {
+                    const contentName = product.name;
+                    const contentId = product._id || product.name.toLowerCase().replace(/\s+/g, '-');
+                    const value = parseFloat(product.price.replace(',', '.'));
+                    const currency = 'BRL';
+                    const numItems = 1;
+                    
+                    ttq.track('InitiateCheckout', {
+                        content_name: contentName,
+                        content_id: contentId,
+                        content_type: 'product',
+                        value: value,
+                        currency: currency,
+                        quantity: numItems
+                    });
+                    console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (ConfiguraPedido Step 1)`);
+                }
+            }
+            
             // Pular a etapa 2 (endereço) e ir diretamente para a etapa 3 (pagamento)
             setCurrentStep(3);
         } else if (currentStep === 3) {

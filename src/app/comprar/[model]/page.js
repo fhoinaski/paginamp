@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation';
 import ConfiguraPedido from '../../../components/comprar/ConfiguraPedido';
 import { slugToName } from '../../../utils/formatters';
 
-// Adicionando diretiva para forçar renderização dinâmica
-export const dynamic = 'force-dynamic';
+// Removida diretiva de renderização dinâmica para permitir cache
+// export const dynamic = 'force-dynamic';
 
 // Esta página é um Server Component
 export default async function ComprarPage({ params }) {
@@ -22,17 +22,10 @@ export default async function ComprarPage({ params }) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
                    (typeof window === 'undefined' ? 'http://localhost:3000' : '');
     
-    // Adicionar um timestamp para evitar cache
-    const timestamp = Date.now();
-    
     // Buscar todos os produtos para encontrar o correspondente pelo slug
-    const response = await fetch(`${apiUrl}/api/products?t=${timestamp}`, { 
-      cache: 'no-store', // Garantir que não use cache
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
+    // Utilizando cache com revalidação a cada hora
+    const response = await fetch(`${apiUrl}/api/products`, { 
+      next: { revalidate: 3600 }, // Revalidação a cada 1 hora
     });
     
     if (!response.ok) {

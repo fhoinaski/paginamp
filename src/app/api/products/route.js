@@ -111,6 +111,13 @@ export async function GET(request) {
     // Tentar buscar produtos com mais logs
     console.log('Buscando documentos na coleção products...');
     const products = await db.collection('products').find({}).toArray();
+    
+    // TODO: Considerar projeção se esta rota for usada para listagens mais leves no futuro:
+    // Ex: Para listagens que não precisam de todos os detalhes de cada produto:
+    // const products = await db.collection('products').find({}, { 
+    //   projection: { name: 1, price: 1, normalPrice: 1, imageUrl: 1, info: 1, _id: 1 } 
+    // }).toArray();
+    
     console.log(`Produtos encontrados: ${products?.length || 0}`);
     
     if (!products || products.length === 0) {

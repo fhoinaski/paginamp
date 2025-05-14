@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { BellRing } from 'lucide-react';
 import { FaBatteryFull, FaWifi, FaCreditCard, FaShieldAlt, FaPrint, FaSimCard, FaRulerCombined, FaWeight } from 'react-icons/fa';
@@ -5,6 +6,7 @@ import Image from 'next/image';
 import { ICON_MAPPING } from '../../utils/constants/icons';
 import { calculateDiscount } from '../../utils/helpers/format';
 import Price from './Price';
+import { trackInitiateCheckout, isPixelReady } from '../../lib/fbPixel';
 
 
 
@@ -84,6 +86,44 @@ const calcularDesconto = (precoNormal, precoVenda) => {
 const ProductCard = ({ product }) => {
     const desconto = calculateDiscount(product.normalPrice, product.price);
 
+    const handleInitiateCheckoutClick = () => {
+        if (product) {
+            // Tenta rastrear o evento do FB Pixel
+            if (isPixelReady()) {
+                trackInitiateCheckout(product);
+                console.log(`Evento InitiateCheckout para ${product.name} rastreado com sucesso no ProductCard.`);
+            } else {
+                console.warn('FB Pixel não estava pronto para InitiateCheckout no ProductCard. Tentando novamente...');
+                // Tenta novamente após um pequeno delay
+                setTimeout(() => {
+                    if (isPixelReady()) {
+                        trackInitiateCheckout(product);
+                        console.log(`Evento InitiateCheckout para ${product.name} rastreado após retry no ProductCard.`);
+                    }
+                }, 500);
+            }
+            
+            // TikTok Pixel continua como antes
+            if (typeof ttq === 'object' && ttq.track) {
+                const contentName = product.name;
+                const contentId = product._id || product.name.toLowerCase().replace(/\s+/g, '-');
+                const value = parseFloat(product.price.replace(',', '.'));
+                const currency = 'BRL';
+                const numItems = 1;
+                
+                ttq.track('InitiateCheckout', {
+                    content_name: contentName,
+                    content_id: contentId,
+                    content_type: 'product',
+                    value: value,
+                    currency: currency,
+                    quantity: numItems
+                });
+                console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (ProductCard)`);
+            }
+        }
+    };
+
     return (
         <div id="modelos" className="card relative rounded-lg rounded-tl-xl border bg-white p-4 pt-10 shadow z-10">
             {/* Ícone superior direito */}
@@ -157,7 +197,13 @@ const ProductCard = ({ product }) => {
                     />
                 </div>
             </div>
-                <a href={product.urlBuy} className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 mt-5 h-12 w-full text-base">Comprar agora</a>
+                <a 
+                    href={product.urlBuy} 
+                    onClick={handleInitiateCheckoutClick}
+                    className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 mt-5 h-12 w-full text-base"
+                >
+                    Comprar agora
+                </a>
                 <div data-orientation="horizontal" role="none" className="shrink-0 bg-border h-[1px] w-full my-5"></div>
                 <ul className="mr-2 flex flex-col gap-3">
                     <li className="flex items-center">

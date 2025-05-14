@@ -10,6 +10,39 @@ console.log('MONGODB_DB definido?', !!process.env.MONGODB_DB);
 // console.log('MONGODB_DB:', process.env.MONGODB_DB);
 console.log('========================');
 
+/*
+ * =======================================================================================
+ * RECOMENDAÇÕES DE INDEXAÇÃO PARA OTIMIZAÇÃO DE PERFORMANCE
+ * =======================================================================================
+ * 
+ * Para garantir a performance das consultas ao MongoDB, especialmente à medida que 
+ * a base de dados cresce, é crucial criar índices nos campos frequentemente utilizados.
+ * 
+ * Coleção 'products':
+ * - _id: Indexado automaticamente pelo MongoDB.
+ * - name: Crie um índice neste campo se houver buscas/filtros frequentes por nome.
+ *   Comando: db.products.createIndex({ name: 1 })
+ * 
+ * Coleção 'users':
+ * - _id: Indexado automaticamente.
+ * - email: ESSENCIAL criar um índice único neste campo para otimizar logins.
+ *   Comando: db.users.createIndex({ email: 1 }, { unique: true })
+ * 
+ * Coleção 'configurations':
+ * - _id: Indexado automaticamente (suficiente para busca por CONFIG_ID).
+ * 
+ * Coleção 'page_views' (se implementada para analytics):
+ * - pageSlug: Recomendado índice para contagem e agregações rápidas.
+ *   Comando: db.page_views.createIndex({ pageSlug: 1 })
+ * - createdAt: Índice para queries por período de tempo.
+ *   Comando: db.page_views.createIndex({ createdAt: 1 })
+ * 
+ * IMPORTANTE: Índices melhoram a performance de leitura mas podem 
+ * impactar a performance de escrita. Use com moderação em coleções 
+ * com alto volume de operações de escrita.
+ * =======================================================================================
+ */
+
 // Variáveis de fallback para quando as vars de ambiente falham
 const FALLBACK_MONGODB_URI = 'mongodb+srv://encmaquininhas:0OEuZVHbcuC2PUZk@cluster0.sgebrtm.mongodb.net';
 

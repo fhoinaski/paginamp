@@ -34,6 +34,10 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Produto não encontrado' }, { status: 404 });
     }
     
+    // TODO: Considerar implementar cache para produtos individuais em productCache.js
+    // para reduzir hits no DB para produtos frequentemente acessados.
+    // Exemplo: Implementar um map de IDs para produtos com TTL.
+    
     return NextResponse.json({ product });
   } catch (error) {
     console.error(`Erro ao buscar produto ${id}:`, error);

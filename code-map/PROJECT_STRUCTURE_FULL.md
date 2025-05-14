@@ -7,7 +7,7 @@ Analise o projeto, responda às perguntas e gere código/sugestões baseando-se 
 
 ---
 
-**Gerado em:** 13/05/2025, 20:44:13
+**Gerado em:** 13/05/2025, 23:24:00
 **Diretório Raiz Analisado:** `E:\Projetos\maquininhaspoint\maquininhas-point`
 **Node Version:** v18.20.4 | **Plataforma:** win32
 
@@ -101,6 +101,9 @@ maquininhas-point/
 │   │   │   ├── 📁 auth/
 │   │   │   │   └── 📁 login/
 │   │   │   │       └── 📄 route.js
+│   │   │   ├── 📁 configurations/
+│   │   │   │   └── 📁 tracking/
+│   │   │   │       └── 📄 route.js
 │   │   │   └── 📁 products/
 │   │   │       ├── 📁 [id]/
 │   │   │       │   └── 📄 route.js
@@ -124,6 +127,8 @@ maquininhas-point/
 │   │   ├── 📁 login/
 │   │   │   └── 📄 page.js
 │   │   ├── 📁 maquininhas/
+│   │   │   ├── 📁 [model]/
+│   │   │   │   └── 📄 layout.js
 │   │   │   ├── 📁 point-air/
 │   │   │   │   ├── 📄 layout.js
 │   │   │   │   └── 📄 page.js
@@ -136,6 +141,8 @@ maquininhas-point/
 │   │   │   └── 📁 point-smart-2/
 │   │   │       ├── 📄 layout.js
 │   │   │       └── 📄 page.js
+│   │   ├── 📁 sitemap.xml/
+│   │   │   └── 📄 route.js
 │   │   ├── 📄 globals.css
 │   │   ├── 📄 layout.js
 │   │   └── 📄 page.js
@@ -170,6 +177,7 @@ maquininhas-point/
 │   │   ├── 📄 ConhecaPointPro3.js
 │   │   ├── 📄 EspecificacoesTecnicas.css
 │   │   ├── 📄 EspecificacoesTecnicas.js
+│   │   ├── 📄 FacebookPixelInitializer.js
 │   │   ├── 📄 FeedbackForm.js
 │   │   ├── 📄 Footer.js
 │   │   ├── 📄 Header.js
@@ -181,6 +189,7 @@ maquininhas-point/
 │   │   ├── 📄 ProductCatalog.js
 │   │   ├── 📄 ProductComparison.js
 │   │   ├── 📄 ProductDetail.js
+│   │   ├── 📄 ProductJsonLd.js
 │   │   ├── 📄 Produtos.js
 │   │   ├── 📄 ProdutosClient.js
 │   │   ├── 📄 ProtectedRoute.js
@@ -210,6 +219,7 @@ maquininhas-point/
 │   │   ├── 📄 useProduct.js
 │   │   └── 📄 useProductCard.js
 │   ├── 📁 lib/
+│   │   ├── 📄 fbPixel.js
 │   │   ├── 📄 mongodb.js
 │   │   ├── 📄 productCache.js
 │   │   ├── 📄 productFecth.js
@@ -314,6 +324,95 @@ export async function POST(request) {
       { error: 'Erro interno do servidor' },
       { status: 500 }
     );
+  }
+}
+```
+
+
+---
+### 📄 Arquivo: `src/app/api/configurations/tracking/route.js`
+
+```javascript
+import { NextResponse } from 'next/server';
+import { connectToDatabase } from '../../../../lib/mongodb'; // Ajuste o caminho se necessário
+
+export const dynamic = 'force-dynamic'; // Garante que a API não seja cacheada
+
+const CONFIG_ID = "site_tracking_settings"; // ID fixo para o documento de configuração
+
+// GET /api/configurations/tracking
+export async function GET(request) {
+  try {
+    const { db } = await connectToDatabase();
+    if (!db) {
+      return NextResponse.json({ error: 'Banco de dados não disponível' }, { status: 500 });
+    }
+
+    const configurationsCollection = db.collection('configurations');
+    let settings = await configurationsCollection.findOne({ _id: CONFIG_ID });
+
+    if (!settings) {
+      // Se não houver configurações, retorna valores padrão/vazios
+      settings = {
+        _id: CONFIG_ID,
+        facebookPixelId: '',
+        tiktokPixelId: '',
+        googleTagId: '',
+        lastUpdatedAt: new Date()
+      };
+      // Opcionalmente, poderia criar o documento aqui se não existir
+      // await configurationsCollection.insertOne(settings); 
+    }
+    
+    // Remover _id da resposta se não for necessário no frontend
+    const { _id, ...trackingSettings } = settings;
+
+    return NextResponse.json({ settings: trackingSettings });
+  } catch (error) {
+    console.error('Erro ao buscar configurações de rastreamento:', error);
+    return NextResponse.json({ error: 'Erro interno do servidor ao buscar configurações' }, { status: 500 });
+  }
+}
+
+// POST /api/configurations/tracking (para salvar/atualizar)
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { facebookPixelId, tiktokPixelId, googleTagId } = body;
+
+    // Validação básica dos IDs (opcional, mas recomendado)
+    if (typeof facebookPixelId === 'undefined' || typeof tiktokPixelId === 'undefined' || typeof googleTagId === 'undefined') {
+      return NextResponse.json({ error: 'Dados incompletos para salvar configurações de rastreamento' }, { status: 400 });
+    }
+
+    const { db } = await connectToDatabase();
+    if (!db) {
+      return NextResponse.json({ error: 'Banco de dados não disponível' }, { status: 500 });
+    }
+
+    const configurationsCollection = db.collection('configurations');
+    const updateData = {
+      facebookPixelId: facebookPixelId || '', // Garante que seja string vazia se nulo/undefined
+      tiktokPixelId: tiktokPixelId || '',
+      googleTagId: googleTagId || '',
+      lastUpdatedAt: new Date()
+    };
+
+    const result = await configurationsCollection.updateOne(
+      { _id: CONFIG_ID },
+      { $set: updateData },
+      { upsert: true } // Cria o documento se não existir
+    );
+
+    if (result.modifiedCount > 0 || result.upsertedCount > 0) {
+      return NextResponse.json({ success: true, message: 'Configurações de rastreamento salvas com sucesso' });
+    } else {
+      return NextResponse.json({ success: false, message: 'Nenhuma alteração foi feita ou falha ao salvar.' });
+    }
+
+  } catch (error) {
+    console.error('Erro ao salvar configurações de rastreamento:', error);
+    return NextResponse.json({ error: 'Erro interno do servidor ao salvar configurações' }, { status: 500 });
   }
 }
 ```
@@ -889,19 +988,53 @@ export async function GET(request) {
 
 ```javascript
 import './style.css';
+import { staticProductData } from '../../../data/staticProductData';
+import { slugToName } from '../../../utils/formatters';
 
-export const metadata = {
-    title: "Configure seu Pedido - Point Smart 2",
-    description: "Escolha a maquininha perfeita para o seu negócio",
-  };
+export async function generateMetadata({ params }) {
+  const productSlug = params.model;
+  const productName = slugToName(productSlug);
   
-  export default function Layout({ children }) {
-    return (
-      <>
-        {children}
-      </>
-    );
+  // Encontra o produto correspondente
+  const product = staticProductData.find(p => 
+    p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+  );
+  
+  // Se o produto não for encontrado
+  if (!product) {
+    return {
+      title: "Configurar Pedido - Produto não encontrado | Maquininhas Point",
+      description: "Não foi possível encontrar a maquininha para configurar o pedido."
+    };
   }
+  
+  // Se o produto for encontrado, retorna metadados completos
+  return {
+    title: `Comprar ${product.name} - Configure seu Pedido | Maquininhas Point`,
+    description: `Configure seu pedido para a maquininha ${product.name}. Escolha operadora, veja preço (${product.price}) e finalize sua compra com segurança. Frete grátis!`,
+    keywords: `comprar ${product.name}, pedido ${product.name}, configurar ${product.name}, preço ${product.name}, maquininha point, ${product.info}`,
+    openGraph: {
+      title: `Comprar ${product.name} Agora | Maquininhas Point`,
+      description: `Configure e compre sua ${product.name} com as melhores condições. Preço promocional R$ ${product.price}.`,
+      images: [{ 
+        url: product.imageUrl,
+        width: 600, 
+        height: 600, 
+        alt: `Comprar ${product.name}` 
+      }],
+      siteName: 'Maquininhas Point',
+      type: 'website'
+    }
+  };
+}
+  
+export default function Layout({ children }) {
+  return (
+    <>
+      {children}
+    </>
+  );
+}
 ```
 
 
@@ -1047,6 +1180,12 @@ const DashboardConfiguracoes = () => {
     currencySymbol: 'R$'
   });
   
+  const [trackingConfig, setTrackingConfig] = useState({
+    facebookPixelId: '',
+    tiktokPixelId: '',
+    googleTagId: ''
+  });
+  
   useEffect(() => {
     // Carregar configurações quando a página for montada
     loadConfigurations();
@@ -1057,11 +1196,14 @@ const DashboardConfiguracoes = () => {
     setMessage({ type: '', text: '' });
     
     try {
-      // Em um ambiente real, você carregaria as configurações da API
-      // Por enquanto, usando dados simulados
-      
-      // Simulação de resposta da API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Carregar configurações de rastreamento
+      const trackingRes = await axios.get('/api/configurations/tracking');
+      if (trackingRes.data && trackingRes.data.settings) {
+        setTrackingConfig(trackingRes.data.settings);
+      }
+
+      // Simular carregamento de outras configs por enquanto
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       setMessage({ type: 'success', text: 'Configurações carregadas com sucesso!' });
       
@@ -1074,6 +1216,8 @@ const DashboardConfiguracoes = () => {
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
       setMessage({ type: 'error', text: 'Erro ao carregar configurações. Tente novamente.' });
+      // Definir valores padrão em caso de erro
+      setTrackingConfig({ facebookPixelId: '', tiktokPixelId: '', googleTagId: '' });
     } finally {
       setIsLoading(false);
     }
@@ -1084,21 +1228,18 @@ const DashboardConfiguracoes = () => {
     setMessage({ type: 'info', text: 'Salvando configurações...' });
     
     try {
-      // Em um ambiente real, você enviaria as configurações para a API
-      // Por enquanto, usando uma simulação de envio
-      
-      // Simular tempo de processamento
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Configurações a serem enviadas (combinação de todos os estados)
-      const configToSave = {
+      // Salvar configurações de rastreamento
+      await axios.post('/api/configurations/tracking', trackingConfig);
+
+      // Simular salvamento de outras configs
+      const otherConfigsToSave = {
         general: generalConfig,
         api: apiConfig,
         display: displayConfig
       };
-      
-      console.log('Configurações salvas:', configToSave);
-      
+      console.log('Outras configurações (simulado):', otherConfigsToSave);
+      await new Promise(resolve => setTimeout(resolve, 700)); 
+
       setMessage({ type: 'success', text: 'Configurações salvas com sucesso!' });
       
       // Após 3 segundos, limpar a mensagem de sucesso
@@ -1109,7 +1250,13 @@ const DashboardConfiguracoes = () => {
       }, 3000);
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
-      setMessage({ type: 'error', text: `Erro ao salvar: ${error.message}` });
+      let errorMessage = 'Erro ao salvar configurações.';
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      setMessage({ type: 'error', text: `Erro ao salvar: ${errorMessage}` });
     } finally {
       setIsSaving(false);
     }
@@ -1154,6 +1301,14 @@ const DashboardConfiguracoes = () => {
     }));
   };
   
+  // Adicionar handler para tracking config
+  const handleTrackingConfigChange = (field, value) => {
+    setTrackingConfig(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+  
   return (
     <div>
       <div className="mb-6">
@@ -1194,6 +1349,61 @@ const DashboardConfiguracoes = () => {
           <Save className="w-4 h-4 mr-2" />
           {isSaving ? 'Salvando...' : 'Salvar Configurações'}
         </button>
+      </div>
+      
+      {/* Configurações de Rastreamento (Pixels) */}
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6 overflow-x-auto">
+        <h2 className="text-xl font-semibold mb-4">Configurações de Rastreamento (Pixels)</h2>
+        
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Facebook Pixel ID
+            </label>
+            <input
+              type="text"
+              value={trackingConfig.facebookPixelId}
+              onChange={(e) => handleTrackingConfigChange('facebookPixelId', e.target.value)}
+              placeholder="Ex: 123456789012345"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Deixe em branco para desativar o Facebook Pixel.
+            </p>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              TikTok Pixel ID
+            </label>
+            <input
+              type="text"
+              value={trackingConfig.tiktokPixelId}
+              onChange={(e) => handleTrackingConfigChange('tiktokPixelId', e.target.value)}
+              placeholder="Ex: ABCDEFGHIJ1234567890"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Deixe em branco para desativar o TikTok Pixel.
+            </p>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Google Tag ID (GA4 ou GTM)
+            </label>
+            <input
+              type="text"
+              value={trackingConfig.googleTagId}
+              onChange={(e) => handleTrackingConfigChange('googleTagId', e.target.value)}
+              placeholder="Ex: G-XXXXXXXXXX ou GTM-XXXXXX"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Use o formato G-XXXXXXXXXX para GA4 ou GTM-XXXXXX para Google Tag Manager. Deixe em branco para desativar.
+            </p>
+          </div>
+        </div>
       </div>
       
       {/* Configurações Gerais */}
@@ -2671,21 +2881,115 @@ export default function LoginPage() {
 
 
 ---
+### 📄 Arquivo: `src/app/maquininhas/[model]/layout.js`
+
+```javascript
+import { staticProductData } from '../../../data/staticProductData';
+import { slugToName } from '../../../utils/formatters';
+
+export async function generateMetadata({ params }) {
+  const productSlug = params.model;
+  const productName = slugToName(productSlug);
+  
+  // Encontra o produto correspondente
+  const product = staticProductData.find(p => 
+    p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+  );
+
+  const currentYear = new Date().getFullYear();
+  
+  // Se o produto não for encontrado
+  if (!product) {
+    return {
+      title: "Produto não encontrado | Maquininhas Point",
+      description: "A maquininha que você procura não foi encontrada."
+    };
+  }
+  
+  // Se o produto for encontrado, retorna metadados completos
+  return {
+    title: `Conheça a ${product.name} | Maquininha Point - ${product.info}`,
+    description: `Descubra tudo sobre a ${product.name}: ${product.info}. Veja especificações, taxas e compre online com frete grátis. Ideal para seu negócio em ${currentYear}.`,
+    keywords: `maquininha ${product.name}, comprar ${product.name}, point ${product.name}, ${product.info}, taxas ${product.name}, mercado pago, revendedor autorizado`,
+    openGraph: {
+      title: `Comprar ${product.name} | Maquininhas Point Revendedor Autorizado`,
+      description: `Explore a ${product.name}: ${product.info}. A melhor escolha para suas vendas.`,
+      images: [{ 
+        url: product.imageUrl,
+        width: 600, 
+        height: 600, 
+        alt: product.name 
+      }],
+      siteName: 'Maquininhas Point',
+      type: 'website'
+    }
+  };
+}
+
+export default function Layout({ children }) {
+  return (
+    <>
+      {children}
+    </>
+  );
+}
+```
+
+
+---
 ### 📄 Arquivo: `src/app/maquininhas/point-air/layout.js`
 
 ```javascript
-export const metadata = {
-    title: "Point Air",
-    description: "Escolha a maquininha perfeita para o seu negócio",
-  };
+import { staticProductData } from '../../../data/staticProductData';
+import { slugToName } from '../../../utils/formatters';
+
+export async function generateMetadata({ params }) {
+  // Usar "point-air" como modelo fixo já que sabemos que estamos neste diretório
+  const productSlug = "point-air";
+  const productName = slugToName(productSlug);
   
-  export default function Layout({ children }) {
-    return (
-      <>
-        {children}
-      </>
-    );
+  // Encontra o produto correspondente
+  const product = staticProductData.find(p => 
+    p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+  );
+
+  const currentYear = new Date().getFullYear();
+  
+  // Se o produto não for encontrado
+  if (!product) {
+    return {
+      title: "Produto não encontrado | Maquininhas Point",
+      description: "A maquininha que você procura não foi encontrada."
+    };
   }
+  
+  // Se o produto for encontrado, retorna metadados completos
+  return {
+    title: `Conheça a ${product.name} | Maquininha Point - ${product.info}`,
+    description: `Descubra tudo sobre a ${product.name}: ${product.info}. Veja especificações, taxas e compre online com frete grátis. Ideal para seu negócio em ${currentYear}.`,
+    keywords: `maquininha ${product.name}, comprar ${product.name}, point ${product.name}, ${product.info}, taxas ${product.name}, mercado pago, revendedor autorizado`,
+    openGraph: {
+      title: `Comprar ${product.name} | Maquininhas Point Revendedor Autorizado`,
+      description: `Explore a ${product.name}: ${product.info}. A melhor escolha para suas vendas.`,
+      images: [{ 
+        url: product.imageUrl,
+        width: 600, 
+        height: 600, 
+        alt: product.name 
+      }],
+      siteName: 'Maquininhas Point',
+      type: 'website'
+    }
+  };
+}
+
+export default function Layout({ children }) {
+  return (
+    <>
+      {children}
+    </>
+  );
+}
 ```
 
 
@@ -2693,7 +2997,8 @@ export const metadata = {
 ### 📄 Arquivo: `src/app/maquininhas/point-air/page.js`
 
 ```javascript
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import CardFlag from '../../../components/CardFlag';
 import SectionTaxas from '../../../components/SectionTaxas';
 import SectionPointAir from '../../../components/SectionPointAir';
@@ -2704,11 +3009,80 @@ import HeroSectionPointAir from '../../../components/points/HeroSectionPointAir'
 import SectionConta from '../../../components/SectionConta';
 import SectionNovaAir from '../../../components/SectionNovaAir';
 import MenuPopover from '../../../components/MenuPopover';
+import ProductJsonLd from '../../../components/ProductJsonLd';
+import { staticProductData } from '../../../data/staticProductData';
+import { trackViewContent, trackInitiateCheckout } from '../../../lib/fbPixel';
 
+export default function PointAirPage() {
+  const [productDetails, setProductDetails] = useState(null);
+  const productSlug = "point-air"; // Slug fixo para esta página
 
-export default function Home() {
+  useEffect(() => {
+    const foundProduct = staticProductData.find(p => 
+      p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+    );
+    if (foundProduct) {
+      setProductDetails(foundProduct);
+    } else {
+      console.warn(`Produto com slug ${productSlug} não encontrado para ViewContent.`);
+    }
+  }, [productSlug]);
+
+  useEffect(() => {
+    if (productDetails) {
+      // 1. Tentativa de rastreamento do FB Pixel
+      trackViewContent(productDetails);
+      
+      // 2. Rastreamento do TikTok Pixel (permanece igual)
+      if (typeof ttq === 'object' && ttq.track) {
+        const contentName = productDetails.name;
+        const contentId = productDetails._id || productSlug;
+        const value = parseFloat(productDetails.price.replace(',', '.'));
+        const currency = 'BRL';
+        
+        ttq.track('ViewContent', {
+          content_name: contentName,
+          content_id: contentId,
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          quantity: 1,
+          description: productDetails.info,
+        });
+        console.log(`PIXEL TT EVENT: ViewContent for ${contentName} (Page Load)`);
+      }
+    }
+  }, [productDetails]);
+
+  const handleFinalBuyClick = () => {
+    if (productDetails) {
+      // 1. Tentativa de rastreamento do FB Pixel
+      trackInitiateCheckout(productDetails);
+      
+      // 2. Rastreamento do TikTok Pixel (permanece igual)
+      if (typeof ttq === 'object' && ttq.track) {
+        const contentName = productDetails.name;
+        const contentId = productDetails._id || productSlug;
+        const value = parseFloat(productDetails.price.replace(',', '.'));
+        const currency = 'BRL';
+        const numItems = 1;
+        
+        ttq.track('InitiateCheckout', {
+          content_name: contentName,
+          content_id: contentId,
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          quantity: numItems
+        });
+        console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (Final Buy Button)`);
+      }
+    }
+  };
+
   return (
     <div className="w-screen m-0 p-0">
+      <ProductJsonLd productSlug={productSlug} />
       <MenuPopover /> 
       <HeroSectionPointAir />
       <SectionTaxas />
@@ -2722,7 +3096,13 @@ export default function Home() {
       <section className="relative  bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%] transition duration-500 ">
         <div className="card container py-24 text-center">
           <h2 className="text-xl font-bold uppercase text-black sm:text-2xl">Crescer só depende de você</h2>
-          <a href="/comprar/point-air" className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker">Comprar Point Air</a>
+          <a 
+            href="/comprar/point-air" 
+            onClick={handleFinalBuyClick}
+            className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker"
+          >
+            Comprar Point Air
+          </a>
         </div>
       </section>
     </div>
@@ -2735,18 +3115,56 @@ export default function Home() {
 ### 📄 Arquivo: `src/app/maquininhas/point-mini-nfc-2/layout.js`
 
 ```javascript
-export const metadata = {
-    title: "Point Mini NFC 2",
-    description: "Escolha a maquininha perfeita para o seu negócio",
-  };
+import { staticProductData } from '../../../data/staticProductData';
+import { slugToName } from '../../../utils/formatters';
+
+export async function generateMetadata({ params }) {
+  // Usar "point-mini-nfc-2" como modelo fixo já que sabemos que estamos neste diretório
+  const productSlug = "point-mini-nfc-2";
+  const productName = slugToName(productSlug);
   
-  export default function Layout({ children }) {
-    return (
-      <>
-        {children}
-      </>
-    );
+  // Encontra o produto correspondente
+  const product = staticProductData.find(p => 
+    p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+  );
+
+  const currentYear = new Date().getFullYear();
+  
+  // Se o produto não for encontrado
+  if (!product) {
+    return {
+      title: "Produto não encontrado | Maquininhas Point",
+      description: "A maquininha que você procura não foi encontrada."
+    };
   }
+  
+  // Se o produto for encontrado, retorna metadados completos
+  return {
+    title: `Conheça a ${product.name} | Maquininha Point - ${product.info}`,
+    description: `Descubra tudo sobre a ${product.name}: ${product.info}. Veja especificações, taxas e compre online com frete grátis. Ideal para seu negócio em ${currentYear}.`,
+    keywords: `maquininha ${product.name}, comprar ${product.name}, point ${product.name}, ${product.info}, taxas ${product.name}, mercado pago, revendedor autorizado`,
+    openGraph: {
+      title: `Comprar ${product.name} | Maquininhas Point Revendedor Autorizado`,
+      description: `Explore a ${product.name}: ${product.info}. A melhor escolha para suas vendas.`,
+      images: [{ 
+        url: product.imageUrl,
+        width: 600, 
+        height: 600, 
+        alt: product.name 
+      }],
+      siteName: 'Maquininhas Point',
+      type: 'website'
+    }
+  };
+}
+
+export default function Layout({ children }) {
+  return (
+    <>
+      {children}
+    </>
+  );
+}
 ```
 
 
@@ -2754,7 +3172,8 @@ export const metadata = {
 ### 📄 Arquivo: `src/app/maquininhas/point-mini-nfc-2/page.js`
 
 ```javascript
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import CardFlag from '../../../components/CardFlag';
 import SectionTaxas from '../../../components/SectionTaxas';
 import SectionPointAir from '../../../components/SectionPointAir';
@@ -2765,12 +3184,103 @@ import HeroSectionPointMini from '../../../components/points/HeroSectionPointMin
 import SectionConta from '../../../components/SectionConta';
 import SectionPointMini from '../../../components/SectionPointMini';
 import MenuPopover from '../../../components/MenuPopover';
+import ProductJsonLd from '../../../components/ProductJsonLd';
+import { staticProductData } from '../../../data/staticProductData';
 
+export default function PointMiniPage() {
+  const [productDetails, setProductDetails] = useState(null);
+  const productSlug = "point-mini-nfc-2"; // Slug fixo para esta página
 
+  useEffect(() => {
+    const foundProduct = staticProductData.find(p => 
+      p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+    );
+    if (foundProduct) {
+      setProductDetails(foundProduct);
+    } else {
+      console.warn(`Produto com slug ${productSlug} não encontrado para ViewContent.`);
+    }
+  }, [productSlug]);
 
-export default function Home() {
+  useEffect(() => {
+    if (productDetails) {
+      const contentName = productDetails.name;
+      const contentId = productDetails._id || productSlug;
+      const value = parseFloat(productDetails.price.replace(',', '.'));
+      const currency = 'BRL';
+
+      // Facebook Pixel: ViewContent - verificação mais robusta
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'ViewContent', {
+          content_name: contentName,
+          content_ids: [contentId],
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          product_catalog_id: process.env.NEXT_PUBLIC_FACEBOOK_CATALOG_ID || undefined
+        });
+        console.log(`PIXEL FB EVENT: ViewContent for ${contentName} (Page Load)`);
+      } else {
+        console.warn('Facebook Pixel não disponível para evento ViewContent');
+      }
+
+      // TikTok Pixel: ViewContent
+      if (typeof ttq === 'object' && ttq.track) {
+        ttq.track('ViewContent', {
+          content_name: contentName,
+          content_id: contentId,
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          quantity: 1,
+          description: productDetails.info,
+        });
+        console.log(`PIXEL TT EVENT: ViewContent for ${contentName} (Page Load)`);
+      }
+    }
+  }, [productDetails]);
+
+  const handleFinalBuyClick = () => {
+    if (productDetails) {
+      const contentName = productDetails.name;
+      const contentId = productDetails._id || productSlug;
+      const value = parseFloat(productDetails.price.replace(',', '.'));
+      const currency = 'BRL';
+      const numItems = 1;
+      
+      // Facebook Pixel: InitiateCheckout - verificação mais robusta
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'InitiateCheckout', {
+          content_name: contentName,
+          content_ids: [contentId],
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          num_items: numItems
+        });
+        console.log(`PIXEL FB EVENT: InitiateCheckout for ${contentName} (Final Buy Button)`);
+      } else {
+        console.warn('Facebook Pixel não disponível para evento InitiateCheckout');
+      }
+
+      // TikTok Pixel: InitiateCheckout
+      if (typeof ttq === 'object' && ttq.track) {
+        ttq.track('InitiateCheckout', {
+          content_name: contentName,
+          content_id: contentId,
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          quantity: numItems
+        });
+        console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (Final Buy Button)`);
+      }
+    }
+  };
+
   return (
     <div className="w-screen m-0 p-0">
+      <ProductJsonLd productSlug={productSlug} />
       <MenuPopover />
       <HeroSectionPointMini />
       <SectionTaxas />
@@ -2783,7 +3293,13 @@ export default function Home() {
       <section className="relative transition duration-500  bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%]">
         <div className="card container py-24 text-center">
           <h2 className="text-xl font-bold uppercase text-black sm:text-2xl">Crescer só depende de você</h2>
-          <a href="/comprar/point-mini" className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker">Comprar Point Mini NFC 2 NFC2</a>
+          <a 
+            href="/comprar/point-mini" 
+            onClick={handleFinalBuyClick}
+            className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker"
+          >
+            Comprar Point Mini NFC 2 NFC2
+          </a>
         </div>
       </section>
     </div>
@@ -2796,18 +3312,56 @@ export default function Home() {
 ### 📄 Arquivo: `src/app/maquininhas/point-pro-3/layout.js`
 
 ```javascript
-export const metadata = {
-    title: "Point Pro 3",
-    description: "Escolha a maquininha perfeita para o seu negócio",
-  };
+import { staticProductData } from '../../../data/staticProductData';
+import { slugToName } from '../../../utils/formatters';
+
+export async function generateMetadata({ params }) {
+  // Usar "point-pro-3" como modelo fixo já que sabemos que estamos neste diretório
+  const productSlug = "point-pro-3";
+  const productName = slugToName(productSlug);
   
-  export default function Layout({ children }) {
-    return (
-      <>
-        {children}
-      </>
-    );
+  // Encontra o produto correspondente
+  const product = staticProductData.find(p => 
+    p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+  );
+
+  const currentYear = new Date().getFullYear();
+  
+  // Se o produto não for encontrado
+  if (!product) {
+    return {
+      title: "Produto não encontrado | Maquininhas Point",
+      description: "A maquininha que você procura não foi encontrada."
+    };
   }
+  
+  // Se o produto for encontrado, retorna metadados completos
+  return {
+    title: `Conheça a ${product.name} | Maquininha Point - ${product.info}`,
+    description: `Descubra tudo sobre a ${product.name}: ${product.info}. Veja especificações, taxas e compre online com frete grátis. Ideal para seu negócio em ${currentYear}.`,
+    keywords: `maquininha ${product.name}, comprar ${product.name}, point ${product.name}, ${product.info}, taxas ${product.name}, mercado pago, revendedor autorizado`,
+    openGraph: {
+      title: `Comprar ${product.name} | Maquininhas Point Revendedor Autorizado`,
+      description: `Explore a ${product.name}: ${product.info}. A melhor escolha para suas vendas.`,
+      images: [{ 
+        url: product.imageUrl,
+        width: 600, 
+        height: 600, 
+        alt: product.name 
+      }],
+      siteName: 'Maquininhas Point',
+      type: 'website'
+    }
+  };
+}
+
+export default function Layout({ children }) {
+  return (
+    <>
+      {children}
+    </>
+  );
+}
 ```
 
 
@@ -2815,7 +3369,8 @@ export const metadata = {
 ### 📄 Arquivo: `src/app/maquininhas/point-pro-3/page.js`
 
 ```javascript
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import CardFlag from '../../../components/CardFlag';
 
 import SectionLinkVendas from '../../../components/SectionLinkVendas';
@@ -2827,10 +3382,103 @@ import MenuPopover from '../../../components/MenuPopover';
 import SectionAboutPointPro from '../../../components/points/SectionAboutPointPro';
 import ConhecaPointPro3 from '../../../components/ConhecaPointPro3';
 import SectionConta from '../../../components/SectionConta';
+import ProductJsonLd from '../../../components/ProductJsonLd';
+import { staticProductData } from '../../../data/staticProductData';
 
-export default function Home() {
+export default function PointProPage() {
+  const [productDetails, setProductDetails] = useState(null);
+  const productSlug = "point-pro-3"; // Slug fixo para esta página
+
+  useEffect(() => {
+    const foundProduct = staticProductData.find(p => 
+      p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+    );
+    if (foundProduct) {
+      setProductDetails(foundProduct);
+    } else {
+      console.warn(`Produto com slug ${productSlug} não encontrado para ViewContent.`);
+    }
+  }, [productSlug]);
+
+  useEffect(() => {
+    if (productDetails) {
+      const contentName = productDetails.name;
+      const contentId = productDetails._id || productSlug;
+      const value = parseFloat(productDetails.price.replace(',', '.'));
+      const currency = 'BRL';
+
+      // Facebook Pixel: ViewContent - verificação mais robusta
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'ViewContent', {
+          content_name: contentName,
+          content_ids: [contentId],
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          product_catalog_id: process.env.NEXT_PUBLIC_FACEBOOK_CATALOG_ID || undefined
+        });
+        console.log(`PIXEL FB EVENT: ViewContent for ${contentName} (Page Load)`);
+      } else {
+        console.warn('Facebook Pixel não disponível para evento ViewContent');
+      }
+
+      // TikTok Pixel: ViewContent
+      if (typeof ttq === 'object' && ttq.track) {
+        ttq.track('ViewContent', {
+          content_name: contentName,
+          content_id: contentId,
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          quantity: 1,
+          description: productDetails.info,
+        });
+        console.log(`PIXEL TT EVENT: ViewContent for ${contentName} (Page Load)`);
+      }
+    }
+  }, [productDetails]);
+
+  const handleFinalBuyClick = () => {
+    if (productDetails) {
+      const contentName = productDetails.name;
+      const contentId = productDetails._id || productSlug;
+      const value = parseFloat(productDetails.price.replace(',', '.'));
+      const currency = 'BRL';
+      const numItems = 1;
+      
+      // Facebook Pixel: InitiateCheckout - verificação mais robusta
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'InitiateCheckout', {
+          content_name: contentName,
+          content_ids: [contentId],
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          num_items: numItems
+        });
+        console.log(`PIXEL FB EVENT: InitiateCheckout for ${contentName} (Final Buy Button)`);
+      } else {
+        console.warn('Facebook Pixel não disponível para evento InitiateCheckout');
+      }
+
+      // TikTok Pixel: InitiateCheckout
+      if (typeof ttq === 'object' && ttq.track) {
+        ttq.track('InitiateCheckout', {
+          content_name: contentName,
+          content_id: contentId,
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          quantity: numItems
+        });
+        console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (Final Buy Button)`);
+      }
+    }
+  };
+
   return (
     <div className="w-screen m-0 p-0">
+     <ProductJsonLd productSlug={productSlug} />
      <MenuPopover /> 
       <HeroSectionPointPro />
       <SectionPointPro />
@@ -2845,7 +3493,13 @@ export default function Home() {
       <section className="relative  transition duration-500  bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%]">
         <div className="card container py-24 text-center">
           <h2 className="text-xl font-bold uppercase text-black sm:text-2xl">Crescer só depende de você</h2>
-          <a href="/comprar/point-pro-3" className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker">Comprar Point Pro 3</a>
+          <a 
+            href="/comprar/point-pro-3" 
+            onClick={handleFinalBuyClick}
+            className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker"
+          >
+            Comprar Point Pro 3
+          </a>
         </div>
       </section>
     </div>
@@ -2858,10 +3512,48 @@ export default function Home() {
 ### 📄 Arquivo: `src/app/maquininhas/point-smart-2/layout.js`
 
 ```javascript
-export const metadata = {
-  title: "Point Smart 2",
-  description: "Escolha a maquininha perfeita para o seu negócio",
-};
+import { staticProductData } from '../../../data/staticProductData';
+import { slugToName } from '../../../utils/formatters';
+
+export async function generateMetadata({ params }) {
+  // Usar "point-smart-2" como modelo fixo já que sabemos que estamos neste diretório
+  const productSlug = "point-smart-2";
+  const productName = slugToName(productSlug);
+  
+  // Encontra o produto correspondente
+  const product = staticProductData.find(p => 
+    p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+  );
+
+  const currentYear = new Date().getFullYear();
+  
+  // Se o produto não for encontrado
+  if (!product) {
+    return {
+      title: "Produto não encontrado | Maquininhas Point",
+      description: "A maquininha que você procura não foi encontrada."
+    };
+  }
+  
+  // Se o produto for encontrado, retorna metadados completos
+  return {
+    title: `Conheça a ${product.name} | Maquininha Point - ${product.info}`,
+    description: `Descubra tudo sobre a ${product.name}: ${product.info}. Veja especificações, taxas e compre online com frete grátis. Ideal para seu negócio em ${currentYear}.`,
+    keywords: `maquininha ${product.name}, comprar ${product.name}, point ${product.name}, ${product.info}, taxas ${product.name}, mercado pago, revendedor autorizado`,
+    openGraph: {
+      title: `Comprar ${product.name} | Maquininhas Point Revendedor Autorizado`,
+      description: `Explore a ${product.name}: ${product.info}. A melhor escolha para suas vendas.`,
+      images: [{ 
+        url: product.imageUrl,
+        width: 600, 
+        height: 600, 
+        alt: product.name 
+      }],
+      siteName: 'Maquininhas Point',
+      type: 'website'
+    }
+  };
+}
 
 export default function Layout({ children }) {
   return (
@@ -2877,7 +3569,8 @@ export default function Layout({ children }) {
 ### 📄 Arquivo: `src/app/maquininhas/point-smart-2/page.js`
 
 ```javascript
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import HeroSectionPointSmart2 from '../../../components/points/HeroSectionPointSmart';
 import CardFlag from '../../../components/CardFlag';
 import SectionTaxas from '../../../components/SectionTaxas';
@@ -2889,11 +3582,103 @@ import MenuPopover from '../../../components/MenuPopover';
 import SectionAboutPointSmart from '../../../components/points/SectionAboutPointSmart';
 import SectionPointSmart from '../../../components/points/SectionPointSmart';
 import SectionSmartFerramenta from '../../../components/points/SectionSmartFerramenta';
+import ProductJsonLd from '../../../components/ProductJsonLd';
+import { staticProductData } from '../../../data/staticProductData';
 
+export default function PointSmartPage() {
+  const [productDetails, setProductDetails] = useState(null);
+  const productSlug = "point-smart-2"; // Slug fixo para esta página
 
-export default function Home() {
+  useEffect(() => {
+    const foundProduct = staticProductData.find(p => 
+      p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+    );
+    if (foundProduct) {
+      setProductDetails(foundProduct);
+    } else {
+      console.warn(`Produto com slug ${productSlug} não encontrado para ViewContent.`);
+    }
+  }, [productSlug]);
+
+  useEffect(() => {
+    if (productDetails) {
+      const contentName = productDetails.name;
+      const contentId = productDetails._id || productSlug;
+      const value = parseFloat(productDetails.price.replace(',', '.'));
+      const currency = 'BRL';
+
+      // Facebook Pixel: ViewContent - verificação mais robusta
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'ViewContent', {
+          content_name: contentName,
+          content_ids: [contentId],
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          product_catalog_id: process.env.NEXT_PUBLIC_FACEBOOK_CATALOG_ID || undefined
+        });
+        console.log(`PIXEL FB EVENT: ViewContent for ${contentName} (Page Load)`);
+      } else {
+        console.warn('Facebook Pixel não disponível para evento ViewContent');
+      }
+
+      // TikTok Pixel: ViewContent
+      if (typeof ttq === 'object' && ttq.track) {
+        ttq.track('ViewContent', {
+          content_name: contentName,
+          content_id: contentId,
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          quantity: 1,
+          description: productDetails.info,
+        });
+        console.log(`PIXEL TT EVENT: ViewContent for ${contentName} (Page Load)`);
+      }
+    }
+  }, [productDetails]);
+
+  const handleFinalBuyClick = () => {
+    if (productDetails) {
+      const contentName = productDetails.name;
+      const contentId = productDetails._id || productSlug;
+      const value = parseFloat(productDetails.price.replace(',', '.'));
+      const currency = 'BRL';
+      const numItems = 1;
+      
+      // Facebook Pixel: InitiateCheckout - verificação mais robusta
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'InitiateCheckout', {
+          content_name: contentName,
+          content_ids: [contentId],
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          num_items: numItems
+        });
+        console.log(`PIXEL FB EVENT: InitiateCheckout for ${contentName} (Final Buy Button)`);
+      } else {
+        console.warn('Facebook Pixel não disponível para evento InitiateCheckout');
+      }
+
+      // TikTok Pixel: InitiateCheckout
+      if (typeof ttq === 'object' && ttq.track) {
+        ttq.track('InitiateCheckout', {
+          content_name: contentName,
+          content_id: contentId,
+          content_type: 'product',
+          value: value,
+          currency: currency,
+          quantity: numItems
+        });
+        console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (Final Buy Button)`);
+      }
+    }
+  };
+
   return (
     <div className="w-screen m-0 p-0">
+      <ProductJsonLd productSlug={productSlug} />
       <MenuPopover /> 
       <HeroSectionPointSmart2 />
       <SectionPointSmart />
@@ -2907,11 +3692,88 @@ export default function Home() {
       <section className="relative transition duration-500  bg-gradient-to-b from-[#FFE600_100%] to-[#FFD400_28%]">
         <div className="card container py-24 text-center">
           <h2 className="text-xl font-bold uppercase text-black sm:text-2xl">Crescer só depende de você</h2>
-          <a href="/comprar/point-smart-2" className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker">Comprar Point Smart 2</a>
+          <a 
+            href="/comprar/point-smart-2" 
+            onClick={handleFinalBuyClick}
+            className="relative inline-flex items-center justify-center shrink-0 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background mt-8 h-12 w-60 bg-white px-4 text-base font-medium text-brand-dark hover:bg-slate-100 dark:text-brand-darker"
+          >
+            Comprar Point Smart 2
+          </a>
         </div>
       </section>
     </div>
   );
+}
+```
+
+
+---
+### 📄 Arquivo: `src/app/sitemap.xml/route.js`
+
+```javascript
+import { staticProductData } from '../../data/staticProductData'; 
+
+// URL base do site
+const URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://enocmaquininhas.com.br';
+
+export async function GET() {
+  // Use staticProductData conforme o contexto do projeto.
+  const products = staticProductData; 
+
+  const productUrls = products.map(product => {
+    // Garanta que urlInfo e urlBuy existam e sejam strings válidas para URL
+    let productPageUrl = '';
+    if (product.urlInfo && typeof product.urlInfo === 'string') {
+      productPageUrl = `
+        <url>
+          <loc>${URL}${product.urlInfo.startsWith('/') ? product.urlInfo : '/' + product.urlInfo}</loc>
+          <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+          <changefreq>weekly</changefreq>
+          <priority>0.9</priority>
+        </url>
+      `;
+    }
+    
+    let buyPageUrl = '';
+    // A urlBuy em staticProductData já inclui /comprar/, então não precisamos adicionar.
+    if (product.urlBuy && typeof product.urlBuy === 'string') {
+     buyPageUrl = `
+        <url>
+          <loc>${URL}${product.urlBuy.startsWith('/') ? product.urlBuy : '/' + product.urlBuy}</loc>
+          <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+          <changefreq>monthly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      `;
+    }
+    return `${productPageUrl}${buyPageUrl}`;
+  }).join('');
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      <url>
+        <loc>${URL}/</loc>
+        <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+      </url>
+      ${productUrls}
+      <!-- Adicionar outras URLs estáticas importantes manualmente se necessário
+      <url>
+        <loc>${URL}/contato</loc>
+        <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+      </url>
+      -->
+    </urlset>
+  `;
+
+  return new Response(sitemap, {
+    headers: {
+      'Content-Type': 'application/xml',
+    },
+  });
 }
 ```
 
@@ -3074,57 +3936,140 @@ import { ThemeProvider } from '../contexts/ThemeContext';
 import { AuthProvider } from '../contexts/AuthContext';
 import { TaxasModalProvider } from '../contexts/TaxasModalContext';
 import ClientLayout from '../components/ClientLayout';
+import FacebookPixelInitializer from '../components/FacebookPixelInitializer';
 
 export const metadata = {
-  title: "Maquininhas Point | Revendedor autorizado Point Enoc Maquininhas",
-  description: "Escolha a maquininha perfeita para o seu negócio",
+  title: {
+    default: "Maquininhas Point | Revendedor Autorizado - Compre Já!",
+    template: "%s | Maquininhas Point"
+  },
+  description: "Encontre a maquininha Point ideal para seu negócio: Point Smart 2, Pro 3, Air e Mini NFC 2. Melhores taxas, frete grátis e promoções exclusivas. Compre online!",
+  keywords: "maquininhas point, comprar maquininha, mercado pago point, point smart 2, point pro 3, point air, point mini nfc 2, taxas maquininha, revendedor point, maquininha de cartão",
+  openGraph: {
+    title: "Maquininhas Point | As Melhores Opções para Seu Negócio",
+    description: "Compre sua maquininha Point Smart 2, Pro 3, Air ou Mini NFC 2 com condições especiais. Revendedor Autorizado.",
+    images: [{ 
+      url: '/images/hero.webp', 
+      width: 1200, 
+      height: 630, 
+      alt: 'Maquininhas Point em Promoção' 
+    }],
+    siteName: 'Maquininhas Point',
+    type: 'website',
+    locale: 'pt_BR'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Maquininhas Point | As Melhores Opções para Seu Negócio",
+    description: "Compre sua maquininha Point Smart 2, Pro 3, Air ou Mini NFC 2 com condições especiais.",
+    images: ['/images/hero.webp']
+  }
 };
 
-export default function RootLayout({ children }) {
+async function getTrackingConfigurations() {
+  try {
+    // Construa a URL base de forma segura
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    const response = await fetch(`${baseUrl}/api/configurations/tracking`, {
+      cache: 'no-store', // Para garantir que as configurações sejam sempre as mais recentes
+      next: { revalidate: 60 } // Opcional: revalidar a cada 60s se cache 'no-store' não for usado
+    });
+
+    if (!response.ok) {
+      console.error(`Erro ao buscar configurações de tracking: ${response.status} ${response.statusText}`);
+      return { facebookPixelId: null, tiktokPixelId: null, googleTagId: null };
+    }
+    const data = await response.json();
+    return data.settings || { facebookPixelId: null, tiktokPixelId: null, googleTagId: null };
+  } catch (error) {
+    console.error('Falha ao buscar configurações de tracking no RootLayout:', error);
+    return { facebookPixelId: null, tiktokPixelId: null, googleTagId: null }; // Fallback em caso de erro de fetch
+  }
+}
+
+export default async function RootLayout({ children }) {
+  const trackingConfig = await getTrackingConfigurations();
+
   return (
     <html lang="pt-br" className="scroll-smooth">
       <head>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='%23009EE3' rx='5.273' ry='5.273'></rect><rect width='27.984' height='12.023' x='4.008' y='4.008' fill='%23A5F3FC' rx='1.758' ry='1.758'></rect><g fill='%232E3441'><circle cx='6.012' cy='21.973' r='2.004'></circle><circle cx='6.012' cy='29.988' r='2.004'></circle><circle cx='14.027' cy='21.973' r='2.004'></circle><circle cx='14.027' cy='29.988' r='2.004'></circle><circle cx='21.973' cy='21.973' r='2.004'></circle><circle cx='21.973' cy='29.988' r='2.004'></circle><circle cx='29.988' cy='21.973' r='2.004'></circle><circle cx='29.988' cy='29.988' r='2.004'></circle></g></svg>" type="image/svg+xml" />
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description} />
-        <Script id="facebook-pixel" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '546621900705567');
-            fbq('track', 'PageView');
-          `}
-        </Script>
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: 'none' }}
-            src="https://www.facebook.com/tr?id=546621900705567&ev=PageView&noscript=1"
-          />
-        </noscript>
-        <Script id="tiktok-pixel" strategy="afterInteractive">
-          {`
-            !function (w, d, t) {
-              w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
-              var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
-              ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
-              ttq.load('CS29J6BC77UF26CUDJV0');
-              ttq.page();
-            }(window, document, 'ttq');
-          `}
-        </Script>
+        
+        {/* Facebook Pixel - Apenas noscript tag aqui, inicialização feita via componente cliente */}
+        {trackingConfig && trackingConfig.facebookPixelId && (
+          <noscript>
+            <img
+              height="1"
+              width="1"
+              style={{ display: 'none' }}
+              src={`https://www.facebook.com/tr?id=${trackingConfig.facebookPixelId}&ev=PageView&noscript=1`}
+              alt="Facebook Pixel"
+            />
+          </noscript>
+        )}
+
+        {/* TikTok Pixel */}
+        {trackingConfig && trackingConfig.tiktokPixelId && (
+          <Script id="tiktok-pixel" strategy="afterInteractive">
+            {`
+              !function (w, d, t) {
+                w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+                var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var s=document.createElement("script")
+                ;s.type="text/javascript",s.async=!0,s.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(s,a)};
+                ttq.load('${trackingConfig.tiktokPixelId}');
+                ttq.page();
+              }(window, document, 'ttq');
+            `}
+          </Script>
+        )}
+
+        {/* Google Tag (GA4 ou GTM) */}
+        {trackingConfig && trackingConfig.googleTagId && trackingConfig.googleTagId.startsWith('G-') && (
+          <>
+            <Script async src={`https://www.googletagmanager.com/gtag/js?id=${trackingConfig.googleTagId}`} strategy="afterInteractive" />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${trackingConfig.googleTagId}');
+              `}
+            </Script>
+          </>
+        )}
+        {trackingConfig && trackingConfig.googleTagId && trackingConfig.googleTagId.startsWith('GTM-') && (
+          <>
+            <Script id="google-tag-manager-head" strategy="afterInteractive">
+            {`
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','${trackingConfig.googleTagId}');
+            `}
+            </Script>
+          </>
+        )}
       </head>
       <body className="min-h-screen flex flex-col">
+        {trackingConfig && trackingConfig.googleTagId && trackingConfig.googleTagId.startsWith('GTM-') && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${trackingConfig.googleTagId}`}
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+              title="Google Tag Manager noscript"
+            ></iframe>
+          </noscript>
+        )}
         <AuthProvider>
           <ThemeProvider>
             <TaxasModalProvider>
+              {/* Componente cliente para inicialização do Facebook Pixel */}
+              {trackingConfig && trackingConfig.facebookPixelId && (
+                <FacebookPixelInitializer pixelId={trackingConfig.facebookPixelId} />
+              )}
               <ClientLayout>
                 {children}
               </ClientLayout>
@@ -3206,7 +4151,7 @@ const PointSmartCard = () => {
 
       {/* Point Logo */}
       <div className="absolute -top-4 right-4 sm:right-2">
-        <Image src="/images/point-logo.svg" alt="Point Logo" width={50} height={50} />
+        <Image src="/images/point-logo.svg" alt="Logo oficial Point Mercado Pago" width={50} height={50} />
       </div>
 
       {/* Main Content */}
@@ -3221,7 +4166,7 @@ const PointSmartCard = () => {
         <div className="flex w-2/5 shrink-0 items-center justify-center rounded-md bg-muted p-2 sm:h-[184px] lg:mx-auto lg:h-full lg:w-full lg:bg-transparent py-6 sm:py-2">
           <Image
             src="/images/devices/device-144.webp"
-            alt="Point Smart 2"
+            alt="Maquininha Point Smart 2 - A mais avançada com impressora e tela touchscreen"
             width={70}
             height={122}
             priority
@@ -3314,6 +4259,7 @@ import React, { useState, useEffect } from 'react';
 import InternetProviderSelector from "./InternetProviderSelector";
 import OrderConfiguration from "./OrderConfiguration";
 import { Check, ChevronRight, ExternalLink } from 'lucide-react';
+import { trackInitiateCheckout } from '../../lib/fbPixel';
 
 const ConfiguraPedido = ({ product }) => {
     const [selectedProvider, setSelectedProvider] = useState('36'); // Default to Vivo
@@ -3438,6 +4384,31 @@ const ConfiguraPedido = ({ product }) => {
 
     const nextStep = () => {
         if (currentStep === 1) {
+            // Disparar evento InitiateCheckout quando o usuário prossegue para o pagamento
+            if (product) {
+                // 1. Rastrear evento pelo FB Pixel usando nossa lib
+                trackInitiateCheckout(product);
+                
+                // 2. Rastrear evento pelo TikTok Pixel (permanece igual)
+                if (typeof ttq === 'object' && ttq.track) {
+                    const contentName = product.name;
+                    const contentId = product._id || product.name.toLowerCase().replace(/\s+/g, '-');
+                    const value = parseFloat(product.price.replace(',', '.'));
+                    const currency = 'BRL';
+                    const numItems = 1;
+                    
+                    ttq.track('InitiateCheckout', {
+                        content_name: contentName,
+                        content_id: contentId,
+                        content_type: 'product',
+                        value: value,
+                        currency: currency,
+                        quantity: numItems
+                    });
+                    console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (ConfiguraPedido Step 1)`);
+                }
+            }
+            
             // Pular a etapa 2 (endereço) e ir diretamente para a etapa 3 (pagamento)
             setCurrentStep(3);
         } else if (currentStep === 3) {
@@ -3859,9 +4830,9 @@ const HeroSectionPointAir = () => {
                     </div>
 
                     {/* Coluna da Imagem */}
-                    <div className="flex justify-center md:h-[450px]">
+                    <div className="flex justify-center md:h-[450px] mt-10">
                         <Image
-                            alt="Point Air - Maquininha de cartão"
+                            alt="Point Air - Maquininha de cartão com borda iluminada, sem necessidade de celular e plano de dados grátis"
                             fetchPriority="high"
                             width={450}
                             height={450}
@@ -3876,7 +4847,7 @@ const HeroSectionPointAir = () => {
                 <div className="container mx-auto px-4 mt-6 sm:mt-8">
                     <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm leading-tight text-black">
                         <li className="flex items-center gap-2 sm:gap-3">
-                            <svg class="pog-ui-svg-icon" fill="none" viewBox="0 0 24 24" width="20px" height="20px" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M8.42652 0.75C7.50987 0.75 6.79029 1.44462 6.63972 2.30623L6.11447 4.65523C6.03839 4.99549 6 5.34309 6 5.69175V6.27108L6.00005 21.4789C6.00005 22.4441 6.77191 23.25 7.7527 23.25H16.2474C17.2282 23.25 18.0001 22.4441 18.0001 21.4789L18 6.27108V5.69099C18 5.34293 17.9617 4.99592 17.8859 4.65622L17.3614 2.30639C17.2109 1.44471 16.4913 0.75 15.5746 0.75H8.42652ZM7.50005 21.4789L7.5 6.27108C7.5 6.10843 7.62594 6 7.75265 6H12H16.2473C16.3741 6 16.5 6.10843 16.5 6.27108L16.5001 21.4789C16.5001 21.6416 16.3741 21.75 16.2474 21.75H7.7527C7.62598 21.75 7.50005 21.6416 7.50005 21.4789ZM16.2473 4.5C16.2698 4.5 16.2922 4.50042 16.3144 4.50126L15.8932 2.614L15.8883 2.59221L15.8847 2.57016C15.8483 2.34432 15.6862 2.25 15.5746 2.25H8.42652C8.31495 2.25 8.15283 2.34432 8.11636 2.57016L8.11278 2.59235L8.10788 2.61428L7.68594 4.50125C7.70807 4.50042 7.7303 4.5 7.75265 4.5H12H16.2473ZM9.00002 7.50391H8.25002V8.25391V18.7461V19.4961H9.00002H15H15.75V18.7461V8.25391V7.50391H15H9.00002ZM9.75002 17.9961V9.00391H14.25V17.9961H9.75002Z" fill="rgba(0,0,0,0.9)"></path></svg>
+                            <svg className="pog-ui-svg-icon" fill="none" viewBox="0 0 24 24" width="20px" height="20px" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M8.42652 0.75C7.50987 0.75 6.79029 1.44462 6.63972 2.30623L6.11447 4.65523C6.03839 4.99549 6 5.34309 6 5.69175V6.27108L6.00005 21.4789C6.00005 22.4441 6.77191 23.25 7.7527 23.25H16.2474C17.2282 23.25 18.0001 22.4441 18.0001 21.4789L18 6.27108V5.69099C18 5.34293 17.9617 4.99592 17.8859 4.65622L17.3614 2.30639C17.2109 1.44471 16.4913 0.75 15.5746 0.75H8.42652ZM7.50005 21.4789L7.5 6.27108C7.5 6.10843 7.62594 6 7.75265 6H12H16.2473C16.3741 6 16.5 6.10843 16.5 6.27108L16.5001 21.4789C16.5001 21.6416 16.3741 21.75 16.2474 21.75H7.7527C7.62598 21.75 7.50005 21.6416 7.50005 21.4789ZM16.2473 4.5C16.2698 4.5 16.2922 4.50042 16.3144 4.50126L15.8932 2.614L15.8883 2.59221L15.8847 2.57016C15.8483 2.34432 15.6862 2.25 15.5746 2.25H8.42652C8.31495 2.25 8.15283 2.34432 8.11636 2.57016L8.11278 2.59235L8.10788 2.61428L7.68594 4.50125C7.70807 4.50042 7.7303 4.5 7.75265 4.5H12H16.2473ZM9.00002 7.50391H8.25002V8.25391V18.7461V19.4961H9.00002H15H15.75V18.7461V8.25391V7.50391H15H9.00002ZM9.75002 17.9961V9.00391H14.25V17.9961H9.75002Z" fill="rgba(0,0,0,0.9)"></path></svg>
                             <p className="font-bold">Venda sem precisar do celular</p>
                         </li>
                         
@@ -3984,7 +4955,7 @@ const HeroSectionPointMini = () => {
                     </div>
                     <div className="flex justify-center md:h-[450px]">
                         <Image
-                            alt="hero-image"
+                            alt="Point Mini NFC 2 - Maquininha de cartão compacta que conecta via Bluetooth ao celular"
                             fetchPriority="high"
                             width={450}
                             height={450}
@@ -4085,7 +5056,7 @@ const HeroSectionPointPro = () => {
                     </div>
                     <div className="flex justify-center md:h-[450px]">
                         <Image
-                            alt="hero-image"
+                            alt="Maquininha Point Pro 3 - Nova maquininha com bateria que dura o dia todo e impressora integrada"
                             fetchPriority="high"
                             width={450}
                             height={450}
@@ -4190,7 +5161,7 @@ const HeroSectionPointSmart = () => {
                     </div>
                     <div className="flex justify-center md:h-[450px]">
                         <Image
-                            alt="hero-image"
+                            alt="Maquininha Point Smart 2 - A maquininha mais avançada do Mercado Pago com impressora embutida"
                             fetchPriority="high"
                             width={450}
                             height={450}
@@ -5275,6 +6246,7 @@ export default Price;
 ### 📄 Arquivo: `src/components/ui/ProductCard.js`
 
 ```javascript
+'use client';
 import React from 'react';
 import { BellRing } from 'lucide-react';
 import { FaBatteryFull, FaWifi, FaCreditCard, FaShieldAlt, FaPrint, FaSimCard, FaRulerCombined, FaWeight } from 'react-icons/fa';
@@ -5282,6 +6254,7 @@ import Image from 'next/image';
 import { ICON_MAPPING } from '../../utils/constants/icons';
 import { calculateDiscount } from '../../utils/helpers/format';
 import Price from './Price';
+import { trackInitiateCheckout } from '../../lib/fbPixel';
 
 
 
@@ -5361,6 +6334,32 @@ const calcularDesconto = (precoNormal, precoVenda) => {
 const ProductCard = ({ product }) => {
     const desconto = calculateDiscount(product.normalPrice, product.price);
 
+    const handleInitiateCheckout = () => {
+        if (product) {
+            // 1. Rastrear evento pelo FB Pixel usando nossa lib
+            trackInitiateCheckout(product);
+            
+            // 2. Rastrear evento pelo TikTok Pixel (permanece igual)
+            if (typeof ttq === 'object' && ttq.track) {
+                const contentName = product.name;
+                const contentId = product._id || product.name.toLowerCase().replace(/\s+/g, '-');
+                const value = parseFloat(product.price.replace(',', '.'));
+                const currency = 'BRL';
+                const numItems = 1;
+                
+                ttq.track('InitiateCheckout', {
+                    content_name: contentName,
+                    content_id: contentId,
+                    content_type: 'product',
+                    value: value,
+                    currency: currency,
+                    quantity: numItems
+                });
+                console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (ProductCard)`);
+            }
+        }
+    };
+
     return (
         <div id="modelos" className="card relative rounded-lg rounded-tl-xl border bg-white p-4 pt-10 shadow z-10">
             {/* Ícone superior direito */}
@@ -5414,7 +6413,7 @@ const ProductCard = ({ product }) => {
       )}
                 <div className="flex w-2/5 shrink-0 items-center justify-center rounded-md bg-muted p-2 sm:h-[184px] lg:mx-auto lg:h-full lg:w-full lg:bg-transparent py-6 sm:py-2">
                     <Image
-                        alt={product.name}
+                        alt={`Maquininha ${product.name} - ${product.info || 'detalhes e preço'}`}
                         src={product.imageUrl}
                         width="70"
                         height="122"
@@ -5434,7 +6433,13 @@ const ProductCard = ({ product }) => {
                     />
                 </div>
             </div>
-                <a href={product.urlBuy} className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 mt-5 h-12 w-full text-base">Comprar agora</a>
+                <a 
+                    href={product.urlBuy} 
+                    onClick={handleInitiateCheckout}
+                    className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 mt-5 h-12 w-full text-base"
+                >
+                    Comprar agora
+                </a>
                 <div data-orientation="horizontal" role="none" className="shrink-0 bg-border h-[1px] w-full my-5"></div>
                 <ul className="mr-2 flex flex-col gap-3">
                     <li className="flex items-center">
@@ -6132,6 +7137,27 @@ export default EspecificacoesTecnicas;
 
 
 ---
+### 📄 Arquivo: `src/components/FacebookPixelInitializer.js`
+
+```javascript
+'use client';
+import { useEffect } from 'react';
+import { initFacebookPixel } from '../lib/fbPixel';
+
+// Componente para inicializar o Facebook Pixel no lado do cliente
+export default function FacebookPixelInitializer({ pixelId }) {
+  useEffect(() => {
+    if (pixelId) {
+      initFacebookPixel(pixelId);
+    }
+  }, [pixelId]);
+
+  return null; // Este componente não renderiza nada visível
+}
+```
+
+
+---
 ### 📄 Arquivo: `src/components/FeedbackForm.js`
 
 ```javascript
@@ -6645,7 +7671,7 @@ const MercadoPagoHero = () => {
         <div className="flex justify-center mt-10">
           <Image
             src="/images/hero.webp"
-            alt="hero-image"
+            alt="Variedade de maquininhas Point Mercado Pago em promoção"
             width={450}
             height={450}
             priority
@@ -7368,6 +8394,66 @@ export default ProductDetail;
 
 
 ---
+### 📄 Arquivo: `src/components/ProductJsonLd.js`
+
+```javascript
+import React from 'react';
+import { staticProductData } from '../data/staticProductData';
+
+export default function ProductJsonLd({ productSlug }) {
+  // Encontra o produto com base no slug
+  const product = staticProductData.find(p => 
+    p.name.toLowerCase().replace(/\s+/g, '-') === productSlug
+  );
+
+  if (!product) return null;
+
+  const productSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    // Idealmente, esta seria uma URL absoluta
+    "image": (process.env.NEXT_PUBLIC_BASE_URL || 'https://enocmaquininhas.com.br') + 
+      (product.imageUrl.startsWith('/') ? product.imageUrl : '/' + product.imageUrl),
+    "description": product.info + ". " + product.specifications
+      .map(spec => spec.text)
+      .join(". "),
+    "sku": product._id,
+    "mpn": product._id,
+    "brand": {
+      "@type": "Brand",
+      "name": "Point (Mercado Pago)"
+    },
+    "offers": {
+      "@type": "Offer",
+      // Para "url", idealmente seria uma URL absoluta
+      "url": (process.env.NEXT_PUBLIC_BASE_URL || 'https://enocmaquininhas.com.br') + 
+        (product.urlBuy.startsWith('/') ? product.urlBuy : '/' + product.urlBuy),
+      "priceCurrency": "BRL",
+      "price": product.price.replace(',', '.'),
+      "priceValidUntil": new Date(new Date().getFullYear() + 1, 11, 31).toISOString().split('T')[0],
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": "https://schema.org/InStock"
+    }
+    // Não há dados reais de avaliação disponíveis
+    // "aggregateRating": {
+    //   "@type": "AggregateRating",
+    //   "ratingValue": "4.5",
+    //   "reviewCount": "120"
+    // }
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+    />
+  );
+}
+```
+
+
+---
 ### 📄 Arquivo: `src/components/Produtos.js`
 
 ```javascript
@@ -7890,7 +8976,7 @@ const SectionConta = () => {
               {/* Imagem de fundo */}
               <Image
                 src="/images/rebrand-mp.webp"
-                alt="Homem usando aplicativo do Mercado Pago"
+                alt="Homem utilizando aplicativo do Mercado Pago em seu smartphone para gerir seus negócios"
                 layout="fill"
                 objectFit="cover"
                 quality={100}
@@ -7900,7 +8986,7 @@ const SectionConta = () => {
               {/* Imagem com efeito hover (overlay) */}
               <Image
                 src="/images/Grouprebrand-mp.webp"
-                alt="Overlay do aplicativo"
+                alt="Interface do aplicativo Mercado Pago mostrando recursos financeiros e opções de crédito"
                 layout="fill"
                 objectFit="cover"
                 objectPosition="center top"
@@ -7957,7 +9043,7 @@ const SectionConta = () => {
                 }}>
                   <Image
                     src="/images/cardmp.webp"
-                    alt="Cartão Mercado Pago"
+                    alt="Cartão de crédito Mercado Pago sem anuidade com rendimentos de até 105% do CDI"
                     width={180}
                     height={113}
                     style={{ display: "block" }}
@@ -8012,7 +9098,7 @@ const SectionConta = () => {
                 }}>
                   <Image
                     src="/images/cadeadomp.webp"
-                    alt="Cadeado de segurança"
+                    alt="Ícone de cadeado simbolizando a segurança e proteção contra fraudes oferecida pelo Mercado Pago"
                     width={90}
                     height={90}
                     style={{ display: "block" }}
@@ -8117,7 +9203,7 @@ const SectionNovaAir = () => {
         <div><ul className="space-y-6"><li className="flex gap-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path></svg><span>A borda se ilumina para mostrar se o pagamento foi aprovado.</span></li><li className="flex gap-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path></svg><span>A maquininha inicia rápido, para você começar a vender na mesma hora.</span></li><li className="flex gap-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path></svg><span>A tela é ampla e colorida, dando conforto visual para vender de noite.</span></li><li className="flex gap-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path></svg><span>Não precisa de papel. Envie os comprovantes por SMS.</span></li></ul></div>
         <div className="row-start-2 self-center sm:col-start-2 sm:row-start-1 sm:row-end-3">
         <Image 
-        alt="account features" 
+        alt="Benefícios e funcionalidades da Nova Point Air com borda iluminada e tela ampla" 
         loading="lazy" 
         width={500} 
         height={500} 
@@ -8724,7 +9810,7 @@ const TestimonialSlider = () => {
               <div className="h-36 w-36 shrink-0 md:h-[220px] md:w-[220px]">
                 <Image
                   src={currentTestimonial.image}
-                  alt={currentTestimonial.name}
+                  alt={`Foto de ${currentTestimonial.name} de ${currentTestimonial.location} - Cliente satisfeito com maquininha Point`}
                   width={220}
                   height={220}
                   priority={true}
@@ -9516,6 +10602,83 @@ export const useProductCard = (productId) => {
     isLoading,
     error
   };
+};
+```
+
+
+---
+### 📄 Arquivo: `src/lib/fbPixel.js`
+
+```javascript
+// Função para inicializar o Facebook Pixel
+export const initFacebookPixel = (pixelId) => {
+  if (!pixelId) return;
+
+  // Inicializa o script do Facebook Pixel
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  
+  // Inicializa o pixel com o ID fornecido
+  window.fbq('init', pixelId);
+  window.fbq('track', 'PageView');
+  
+  console.log('Facebook Pixel inicializado através do módulo fbPixel.js com ID:', pixelId);
+};
+
+// Função para rastrear eventos do Facebook Pixel
+export const trackFbPixelEvent = (eventName, params = {}) => {
+  if (typeof window !== 'undefined' && window.fbq) {
+    window.fbq('track', eventName, params);
+    console.log(`Evento FB Pixel rastreado: ${eventName}`, params);
+    return true;
+  } else {
+    console.warn(`Tentativa de rastrear evento FB Pixel ${eventName}, mas fbq não está disponível`);
+    return false;
+  }
+};
+
+// Função para rastrear ViewContent
+export const trackViewContent = (product) => {
+  if (!product) return false;
+  
+  const contentName = product.name;
+  const contentId = product._id || product.name.toLowerCase().replace(/\s+/g, '-');
+  const value = parseFloat(product.price.replace(',', '.'));
+  const currency = 'BRL';
+  
+  return trackFbPixelEvent('ViewContent', {
+    content_name: contentName,
+    content_ids: [contentId],
+    content_type: 'product',
+    value: value,
+    currency: currency
+  });
+};
+
+// Função para rastrear InitiateCheckout
+export const trackInitiateCheckout = (product) => {
+  if (!product) return false;
+  
+  const contentName = product.name;
+  const contentId = product._id || product.name.toLowerCase().replace(/\s+/g, '-');
+  const value = parseFloat(product.price.replace(',', '.'));
+  const currency = 'BRL';
+  const numItems = 1;
+  
+  return trackFbPixelEvent('InitiateCheckout', {
+    content_name: contentName,
+    content_ids: [contentId],
+    content_type: 'product',
+    value: value,
+    currency: currency,
+    num_items: numItems
+  });
 };
 ```
 
