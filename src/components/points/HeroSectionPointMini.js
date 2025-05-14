@@ -55,7 +55,7 @@ const HeroSectionPointMini = () => {
                     </div>
                     <div className="flex justify-center md:h-[450px]">
                         <Image
-                            alt="hero-image"
+                            alt="Point Mini NFC 2 - Maquininha de cartão compacta que conecta via Bluetooth ao celular"
                             fetchPriority="high"
                             width={450}
                             height={450}

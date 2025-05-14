@@ -137,7 +137,7 @@ const ProductCard = ({ product }) => {
       )}
                 <div className="flex w-2/5 shrink-0 items-center justify-center rounded-md bg-muted p-2 sm:h-[184px] lg:mx-auto lg:h-full lg:w-full lg:bg-transparent py-6 sm:py-2">
                     <Image
-                        alt={product.name}
+                        alt={`Maquininha ${product.name} - ${product.info || 'detalhes e preço'}`}
                         src={product.imageUrl}
                         width="70"
                         height="122"

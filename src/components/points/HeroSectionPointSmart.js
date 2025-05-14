@@ -57,7 +57,7 @@ const HeroSectionPointSmart = () => {
                     </div>
                     <div className="flex justify-center md:h-[450px]">
                         <Image
-                            alt="hero-image"
+                            alt="Maquininha Point Smart 2 - A maquininha mais avançada do Mercado Pago com impressora embutida"
                             fetchPriority="high"
                             width={450}
                             height={450}

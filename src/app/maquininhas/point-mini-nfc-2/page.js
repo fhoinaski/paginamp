@@ -9,12 +9,14 @@ import HeroSectionPointMini from '../../../components/points/HeroSectionPointMin
 import SectionConta from '../../../components/SectionConta';
 import SectionPointMini from '../../../components/SectionPointMini';
 import MenuPopover from '../../../components/MenuPopover';
+import ProductJsonLd from '../../../components/ProductJsonLd';
 
 
 
 export default function Home() {
   return (
     <div className="w-screen m-0 p-0">
+      <ProductJsonLd productSlug="point-mini-nfc-2" />
       <MenuPopover />
       <HeroSectionPointMini />
       <SectionTaxas />

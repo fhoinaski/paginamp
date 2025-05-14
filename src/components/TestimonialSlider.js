@@ -82,7 +82,7 @@ const TestimonialSlider = () => {
               <div className="h-36 w-36 shrink-0 md:h-[220px] md:w-[220px]">
                 <Image
                   src={currentTestimonial.image}
-                  alt={currentTestimonial.name}
+                  alt={`Foto de ${currentTestimonial.name} de ${currentTestimonial.location} - Cliente satisfeito com maquininha Point`}
                   width={220}
                   height={220}
                   priority={true}

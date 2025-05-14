@@ -17,7 +17,7 @@ const PointSmartCard = () => {
 
       {/* Point Logo */}
       <div className="absolute -top-4 right-4 sm:right-2">
-        <Image src="/images/point-logo.svg" alt="Point Logo" width={50} height={50} />
+        <Image src="/images/point-logo.svg" alt="Logo oficial Point Mercado Pago" width={50} height={50} />
       </div>
 
       {/* Main Content */}
@@ -32,7 +32,7 @@ const PointSmartCard = () => {
         <div className="flex w-2/5 shrink-0 items-center justify-center rounded-md bg-muted p-2 sm:h-[184px] lg:mx-auto lg:h-full lg:w-full lg:bg-transparent py-6 sm:py-2">
           <Image
             src="/images/devices/device-144.webp"
-            alt="Point Smart 2"
+            alt="Maquininha Point Smart 2 - A mais avançada com impressora e tela touchscreen"
             width={70}
             height={122}
             priority

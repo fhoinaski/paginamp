@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/auth/login/
+Disallow: /api/products/seed/
+Disallow: /dashboard/ 
+# Considere adicionar Disallow: /api/ caso nenhuma rota de API precise ser indexada diretamente.
+
+# Substitua pela URL real do seu site se diferente de enocmaquininhas.com.br
+Sitemap: https://enocmaquininhas.com.br/sitemap.xml 

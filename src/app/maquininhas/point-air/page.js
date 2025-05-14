@@ -9,11 +9,13 @@ import HeroSectionPointAir from '../../../components/points/HeroSectionPointAir'
 import SectionConta from '../../../components/SectionConta';
 import SectionNovaAir from '../../../components/SectionNovaAir';
 import MenuPopover from '../../../components/MenuPopover';
+import ProductJsonLd from '../../../components/ProductJsonLd';
 
 
 export default function Home() {
   return (
     <div className="w-screen m-0 p-0">
+      <ProductJsonLd productSlug="point-air" />
       <MenuPopover /> 
       <HeroSectionPointAir />
       <SectionTaxas />

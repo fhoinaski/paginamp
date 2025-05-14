@@ -72,7 +72,7 @@ const HeroSectionPointPro = () => {
                     </div>
                     <div className="flex justify-center md:h-[450px]">
                         <Image
-                            alt="hero-image"
+                            alt="Maquininha Point Pro 3 - Nova maquininha com bateria que dura o dia todo e impressora integrada"
                             fetchPriority="high"
                             width={450}
                             height={450}

@@ -2,8 +2,7 @@ import { staticProductData } from '../../../data/staticProductData';
 import { slugToName } from '../../../utils/formatters';
 
 export async function generateMetadata({ params }) {
-  // Usar "point-pro-3" como modelo fixo já que sabemos que estamos neste diretório
-  const productSlug = "point-pro-3";
+  const productSlug = params.model;
   const productName = slugToName(productSlug);
   
   // Encontra o produto correspondente
@@ -47,5 +46,4 @@ export default function Layout({ children }) {
       {children}
     </>
   );
-}
-  
+} 

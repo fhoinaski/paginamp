@@ -7,8 +7,31 @@ import { TaxasModalProvider } from '../contexts/TaxasModalContext';
 import ClientLayout from '../components/ClientLayout';
 
 export const metadata = {
-  title: "Maquininhas Point | Revendedor autorizado Point Enoc Maquininhas",
-  description: "Escolha a maquininha perfeita para o seu negócio",
+  title: {
+    default: "Maquininhas Point | Revendedor Autorizado - Compre Já!",
+    template: "%s | Maquininhas Point"
+  },
+  description: "Encontre a maquininha Point ideal para seu negócio: Point Smart 2, Pro 3, Air e Mini NFC 2. Melhores taxas, frete grátis e promoções exclusivas. Compre online!",
+  keywords: "maquininhas point, comprar maquininha, mercado pago point, point smart 2, point pro 3, point air, point mini nfc 2, taxas maquininha, revendedor point, maquininha de cartão",
+  openGraph: {
+    title: "Maquininhas Point | As Melhores Opções para Seu Negócio",
+    description: "Compre sua maquininha Point Smart 2, Pro 3, Air ou Mini NFC 2 com condições especiais. Revendedor Autorizado.",
+    images: [{ 
+      url: '/images/hero.webp', 
+      width: 1200, 
+      height: 630, 
+      alt: 'Maquininhas Point em Promoção' 
+    }],
+    siteName: 'Maquininhas Point',
+    type: 'website',
+    locale: 'pt_BR'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Maquininhas Point | As Melhores Opções para Seu Negócio",
+    description: "Compre sua maquininha Point Smart 2, Pro 3, Air ou Mini NFC 2 com condições especiais.",
+    images: ['/images/hero.webp']
+  }
 };
 
 export default function RootLayout({ children }) {
@@ -16,8 +39,6 @@ export default function RootLayout({ children }) {
     <html lang="pt-br" className="scroll-smooth">
       <head>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='%23009EE3' rx='5.273' ry='5.273'></rect><rect width='27.984' height='12.023' x='4.008' y='4.008' fill='%23A5F3FC' rx='1.758' ry='1.758'></rect><g fill='%232E3441'><circle cx='6.012' cy='21.973' r='2.004'></circle><circle cx='6.012' cy='29.988' r='2.004'></circle><circle cx='14.027' cy='21.973' r='2.004'></circle><circle cx='14.027' cy='29.988' r='2.004'></circle><circle cx='21.973' cy='21.973' r='2.004'></circle><circle cx='21.973' cy='29.988' r='2.004'></circle><circle cx='29.988' cy='21.973' r='2.004'></circle><circle cx='29.988' cy='29.988' r='2.004'></circle></g></svg>" type="image/svg+xml" />
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description} />
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)

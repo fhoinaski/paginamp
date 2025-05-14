@@ -10,10 +10,12 @@ import MenuPopover from '../../../components/MenuPopover';
 import SectionAboutPointPro from '../../../components/points/SectionAboutPointPro';
 import ConhecaPointPro3 from '../../../components/ConhecaPointPro3';
 import SectionConta from '../../../components/SectionConta';
+import ProductJsonLd from '../../../components/ProductJsonLd';
 
 export default function Home() {
   return (
     <div className="w-screen m-0 p-0">
+     <ProductJsonLd productSlug="point-pro-3" />
      <MenuPopover /> 
       <HeroSectionPointPro />
       <SectionPointPro />

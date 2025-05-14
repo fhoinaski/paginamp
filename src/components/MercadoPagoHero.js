@@ -17,7 +17,7 @@ const MercadoPagoHero = () => {
         <div className="flex justify-center mt-10">
           <Image
             src="/images/hero.webp"
-            alt="hero-image"
+            alt="Variedade de maquininhas Point Mercado Pago em promoção"
             width={450}
             height={450}
             priority

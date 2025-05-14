@@ -10,11 +10,13 @@ import MenuPopover from '../../../components/MenuPopover';
 import SectionAboutPointSmart from '../../../components/points/SectionAboutPointSmart';
 import SectionPointSmart from '../../../components/points/SectionPointSmart';
 import SectionSmartFerramenta from '../../../components/points/SectionSmartFerramenta';
+import ProductJsonLd from '../../../components/ProductJsonLd';
 
 
 export default function Home() {
   return (
     <div className="w-screen m-0 p-0">
+      <ProductJsonLd productSlug="point-smart-2" />
       <MenuPopover /> 
       <HeroSectionPointSmart2 />
       <SectionPointSmart />

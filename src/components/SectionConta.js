@@ -90,7 +90,7 @@ const SectionConta = () => {
               {/* Imagem de fundo */}
               <Image
                 src="/images/rebrand-mp.webp"
-                alt="Homem usando aplicativo do Mercado Pago"
+                alt="Homem utilizando aplicativo do Mercado Pago em seu smartphone para gerir seus negócios"
                 layout="fill"
                 objectFit="cover"
                 quality={100}
@@ -100,7 +100,7 @@ const SectionConta = () => {
               {/* Imagem com efeito hover (overlay) */}
               <Image
                 src="/images/Grouprebrand-mp.webp"
-                alt="Overlay do aplicativo"
+                alt="Interface do aplicativo Mercado Pago mostrando recursos financeiros e opções de crédito"
                 layout="fill"
                 objectFit="cover"
                 objectPosition="center top"
@@ -157,7 +157,7 @@ const SectionConta = () => {
                 }}>
                   <Image
                     src="/images/cardmp.webp"
-                    alt="Cartão Mercado Pago"
+                    alt="Cartão de crédito Mercado Pago sem anuidade com rendimentos de até 105% do CDI"
                     width={180}
                     height={113}
                     style={{ display: "block" }}
@@ -212,7 +212,7 @@ const SectionConta = () => {
                 }}>
                   <Image
                     src="/images/cadeadomp.webp"
-                    alt="Cadeado de segurança"
+                    alt="Ícone de cadeado simbolizando a segurança e proteção contra fraudes oferecida pelo Mercado Pago"
                     width={90}
                     height={90}
                     style={{ display: "block" }}
