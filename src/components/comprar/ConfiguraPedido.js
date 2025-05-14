@@ -128,6 +128,21 @@ const ConfiguraPedido = ({ product }) => {
 
     const nextStep = () => {
         if (currentStep === 1) {
+            // Disparar evento InitiateCheckout quando o usuário prossegue para o pagamento
+            if (product && typeof window !== 'undefined') {
+                // Usar o objeto global MPTracker para rastrear eventos
+                if (window.MPTracker) {
+                    try {
+                        window.MPTracker.trackInitiateCheckout(product);
+                        console.log(`Evento InitiateCheckout para ${product.name} enviado via MPTracker em ConfiguraPedido`);
+                    } catch (error) {
+                        console.error('Erro ao rastrear evento InitiateCheckout:', error);
+                    }
+                } else {
+                    console.warn('MPTracker não está disponível. Evento InitiateCheckout não rastreado em ConfiguraPedido.');
+                }
+            }
+            
             // Pular a etapa 2 (endereço) e ir diretamente para a etapa 3 (pagamento)
             setCurrentStep(3);
         } else if (currentStep === 3) {
@@ -233,6 +248,17 @@ const ConfiguraPedido = ({ product }) => {
                                         href={buyLink}
                                         target="_blank"
                                         rel="noopener noreferrer"
+                                        onClick={() => {
+                                            // Disparar evento InitiateCheckout novamente quando o usuário clica no botão de finalização
+                                            if (product && typeof window !== 'undefined' && window.MPTracker) {
+                                                try {
+                                                    window.MPTracker.trackInitiateCheckout(product);
+                                                    console.log(`Evento InitiateCheckout para ${product.name} enviado via MPTracker (clique final)`);
+                                                } catch (error) {
+                                                    console.error('Erro ao rastrear evento InitiateCheckout no clique final:', error);
+                                                }
+                                            }
+                                        }}
                                         className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 h-12 w-2/3 text-base"
                                     >
                                         Finalizar Pedido <ExternalLink size={20} className="ml-2" />
