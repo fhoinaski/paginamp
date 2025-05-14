@@ -12,7 +12,6 @@ import SectionNovaAir from '../../../components/SectionNovaAir';
 import MenuPopover from '../../../components/MenuPopover';
 import ProductJsonLd from '../../../components/ProductJsonLd';
 import { staticProductData } from '../../../data/staticProductData';
-import { trackViewContent, trackInitiateCheckout, isPixelReady } from '../../../lib/fbPixel';
 
 export default function PointAirPage() {
   const [productDetails, setProductDetails] = useState(null);
@@ -30,75 +29,45 @@ export default function PointAirPage() {
   }, [productSlug]);
 
   useEffect(() => {
-    if (productDetails) {
-      const attemptTrackViewContent = () => {
-        if (isPixelReady()) {
-          trackViewContent(productDetails);
-          console.log(`Evento ViewContent para ${productDetails.name} rastreado com sucesso.`);
-        } else {
-          // Se o pixel não estiver pronto, tenta novamente após um pequeno delay
-          console.warn('FB Pixel não estava pronto para ViewContent, tentando novamente em 1s...');
-          setTimeout(attemptTrackViewContent, 1000);
+    if (productDetails && typeof window !== 'undefined') {
+      // Tentar rastrear o evento ViewContent usando o objeto global MPTracker
+      if (window.MPTracker) {
+        try {
+          window.MPTracker.trackViewContent(productDetails);
+          console.log(`Evento ViewContent para ${productDetails.name} enviado via MPTracker`);
+        } catch (error) {
+          console.error('Erro ao rastrear ViewContent:', error);
         }
-      };
-      
-      // Tenta rastrear imediatamente, e se falhar tentará novamente com delay
-      attemptTrackViewContent();
-      
-      // TikTok Pixel continua como antes
-      if (typeof ttq === 'object' && ttq.track) {
-        const contentName = productDetails.name;
-        const contentId = productDetails._id || productSlug;
-        const value = parseFloat(productDetails.price.replace(',', '.'));
-        const currency = 'BRL';
+      } else {
+        console.warn('MPTracker não está disponível. Evento ViewContent não rastreado.');
         
-        ttq.track('ViewContent', {
-          content_name: contentName,
-          content_id: contentId,
-          content_type: 'product',
-          value: value,
-          currency: currency,
-          quantity: 1,
-          description: productDetails.info,
-        });
-        console.log(`PIXEL TT EVENT: ViewContent for ${contentName} (Page Load)`);
+        // Tentar novamente após um pequeno delay
+        setTimeout(() => {
+          if (window.MPTracker) {
+            try {
+              window.MPTracker.trackViewContent(productDetails);
+              console.log(`Evento ViewContent para ${productDetails.name} enviado via MPTracker após retry`);
+            } catch (error) {
+              console.error('Erro ao rastrear ViewContent após retry:', error);
+            }
+          }
+        }, 1500);
       }
     }
   }, [productDetails]);
 
   const handleFinalBuyClick = () => {
-    if (productDetails) {
-      if (isPixelReady()) {
-        trackInitiateCheckout(productDetails);
-        console.log(`Evento InitiateCheckout para ${productDetails.name} rastreado com sucesso.`);
+    if (productDetails && typeof window !== 'undefined') {
+      // Usar o objeto global MPTracker para rastrear eventos
+      if (window.MPTracker) {
+        try {
+          window.MPTracker.trackInitiateCheckout(productDetails);
+          console.log(`Evento InitiateCheckout para ${productDetails.name} enviado via MPTracker`);
+        } catch (error) {
+          console.error('Erro ao rastrear evento InitiateCheckout:', error);
+        }
       } else {
-        console.warn('FB Pixel não estava pronto para InitiateCheckout no clique do botão de compra.');
-        // Para cliques do usuário, podemos usar uma abordagem de tentar uma vez mais após um pequeno delay
-        setTimeout(() => {
-          if (isPixelReady()) {
-            trackInitiateCheckout(productDetails);
-            console.log(`Evento InitiateCheckout para ${productDetails.name} rastreado após retry.`);
-          }
-        }, 500);
-      }
-      
-      // TikTok Pixel continua como antes
-      if (typeof ttq === 'object' && ttq.track) {
-        const contentName = productDetails.name;
-        const contentId = productDetails._id || productSlug;
-        const value = parseFloat(productDetails.price.replace(',', '.'));
-        const currency = 'BRL';
-        const numItems = 1;
-        
-        ttq.track('InitiateCheckout', {
-          content_name: contentName,
-          content_id: contentId,
-          content_type: 'product',
-          value: value,
-          currency: currency,
-          quantity: numItems
-        });
-        console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (Final Buy Button)`);
+        console.warn('MPTracker não está disponível. Evento InitiateCheckout não rastreado.');
       }
     }
   };

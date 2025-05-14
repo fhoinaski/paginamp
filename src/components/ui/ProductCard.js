@@ -6,9 +6,6 @@ import Image from 'next/image';
 import { ICON_MAPPING } from '../../utils/constants/icons';
 import { calculateDiscount } from '../../utils/helpers/format';
 import Price from './Price';
-import { trackInitiateCheckout, isPixelReady } from '../../lib/fbPixel';
-
-
 
 const iconMapping = {
     "bateria": (
@@ -87,39 +84,53 @@ const ProductCard = ({ product }) => {
     const desconto = calculateDiscount(product.normalPrice, product.price);
 
     const handleInitiateCheckoutClick = () => {
-        if (product) {
-            // Tenta rastrear o evento do FB Pixel
-            if (isPixelReady()) {
-                trackInitiateCheckout(product);
-                console.log(`Evento InitiateCheckout para ${product.name} rastreado com sucesso no ProductCard.`);
-            } else {
-                console.warn('FB Pixel não estava pronto para InitiateCheckout no ProductCard. Tentando novamente...');
-                // Tenta novamente após um pequeno delay
-                setTimeout(() => {
-                    if (isPixelReady()) {
-                        trackInitiateCheckout(product);
-                        console.log(`Evento InitiateCheckout para ${product.name} rastreado após retry no ProductCard.`);
+        if (product && typeof window !== 'undefined') {
+            // Usar o objeto global MPTracker para rastrear eventos
+            if (window.MPTracker) {
+                try {
+                    window.MPTracker.trackInitiateCheckout(product);
+                    console.log(`Evento InitiateCheckout para ${product.name} enviado via MPTracker`);
+                    
+                    // Verificação adicional para o TikTok
+                    if (!window.ttq && window.MPTracker.pixelIds.tiktok) {
+                        console.warn('TikTok ttq não disponível, tentando inicializar manualmente...');
+                        // Tentar inicializar o TikTok novamente
+                        const tiktokId = window.MPTracker.pixelIds.tiktok;
+                        if (tiktokId) {
+                            try {
+                                window.TiktokAnalyticsObject = "ttq";
+                                window.ttq = window.ttq || [];
+                                
+                                if (typeof window.ttq.load === 'function') {
+                                    window.ttq.load(tiktokId);
+                                    window.ttq.page();
+                                    console.log('TikTok Pixel reinicializado manualmente.');
+                                    
+                                    // Tentar enviar o evento novamente após inicialização
+                                    setTimeout(() => {
+                                        if (typeof window.ttq.track === 'function') {
+                                            window.ttq.track('InitiateCheckout', {
+                                                content_name: product.name,
+                                                content_id: product._id || product.name.toLowerCase().replace(/\s+/g, '-'),
+                                                content_type: 'product',
+                                                value: parseFloat(product.price.replace(',', '.')),
+                                                currency: 'BRL',
+                                                quantity: 1
+                                            });
+                                            console.log('TikTok InitiateCheckout enviado manualmente após reinicialização');
+                                        }
+                                    }, 500);
+                                }
+                            } catch (error) {
+                                console.error('Erro ao tentar reinicializar o TikTok Pixel:', error);
+                            }
+                        }
                     }
-                }, 500);
-            }
-            
-            // TikTok Pixel continua como antes
-            if (typeof ttq === 'object' && ttq.track) {
-                const contentName = product.name;
-                const contentId = product._id || product.name.toLowerCase().replace(/\s+/g, '-');
-                const value = parseFloat(product.price.replace(',', '.'));
-                const currency = 'BRL';
-                const numItems = 1;
-                
-                ttq.track('InitiateCheckout', {
-                    content_name: contentName,
-                    content_id: contentId,
-                    content_type: 'product',
-                    value: value,
-                    currency: currency,
-                    quantity: numItems
-                });
-                console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (ProductCard)`);
+                } catch (error) {
+                    console.error('Erro ao rastrear evento InitiateCheckout:', error);
+                }
+            } else {
+                console.warn('MPTracker não está disponível. Evento InitiateCheckout não rastreado.');
             }
         }
     };

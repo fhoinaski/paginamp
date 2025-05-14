@@ -29,11 +29,11 @@ export const fetchProductData = async () => {
     }
     
     const data = await response.json();
-    console.log('Dados recebidos da API:', data);
+ 
     
     // Verificar se os dados estão na estrutura esperada
     if (!data || !data.products || !Array.isArray(data.products) || data.products.length === 0) {
-      console.warn('Dados inválidos ou vazios da API, usando staticProductData como fallback');
+     
       return staticProductData;
     }
     
@@ -65,7 +65,7 @@ export const fetchProductData = async () => {
       return staticProduct;
     });
     
-    console.log(`${combinedProducts.length} produtos combinados com sucesso`);
+    
     return combinedProducts;
     
   } catch (error) {

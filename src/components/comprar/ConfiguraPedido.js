@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import InternetProviderSelector from "./InternetProviderSelector";
 import OrderConfiguration from "./OrderConfiguration";
 import { Check, ChevronRight, ExternalLink } from 'lucide-react';
-import { trackInitiateCheckout, isPixelReady } from '../../lib/fbPixel';
 
 const ConfiguraPedido = ({ product }) => {
     const [selectedProvider, setSelectedProvider] = useState('36'); // Default to Vivo
@@ -130,39 +129,17 @@ const ConfiguraPedido = ({ product }) => {
     const nextStep = () => {
         if (currentStep === 1) {
             // Disparar evento InitiateCheckout quando o usuário prossegue para o pagamento
-            if (product) {
-                // Tenta rastrear o evento do FB Pixel
-                if (isPixelReady()) {
-                    trackInitiateCheckout(product);
-                    console.log(`Evento InitiateCheckout para ${product.name} rastreado com sucesso em ConfiguraPedido.`);
+            if (product && typeof window !== 'undefined') {
+                // Usar o objeto global MPTracker para rastrear eventos
+                if (window.MPTracker) {
+                    try {
+                        window.MPTracker.trackInitiateCheckout(product);
+                        console.log(`Evento InitiateCheckout para ${product.name} enviado via MPTracker em ConfiguraPedido`);
+                    } catch (error) {
+                        console.error('Erro ao rastrear evento InitiateCheckout:', error);
+                    }
                 } else {
-                    console.warn('FB Pixel não estava pronto para InitiateCheckout em ConfiguraPedido. Tentando novamente...');
-                    // Tenta novamente após um pequeno delay
-                    setTimeout(() => {
-                        if (isPixelReady()) {
-                            trackInitiateCheckout(product);
-                            console.log(`Evento InitiateCheckout para ${product.name} rastreado após retry em ConfiguraPedido.`);
-                        }
-                    }, 500);
-                }
-                
-                // TikTok Pixel continua como antes
-                if (typeof ttq === 'object' && ttq.track) {
-                    const contentName = product.name;
-                    const contentId = product._id || product.name.toLowerCase().replace(/\s+/g, '-');
-                    const value = parseFloat(product.price.replace(',', '.'));
-                    const currency = 'BRL';
-                    const numItems = 1;
-                    
-                    ttq.track('InitiateCheckout', {
-                        content_name: contentName,
-                        content_id: contentId,
-                        content_type: 'product',
-                        value: value,
-                        currency: currency,
-                        quantity: numItems
-                    });
-                    console.log(`PIXEL TT EVENT: InitiateCheckout for ${contentName} (ConfiguraPedido Step 1)`);
+                    console.warn('MPTracker não está disponível. Evento InitiateCheckout não rastreado em ConfiguraPedido.');
                 }
             }
             
@@ -198,87 +175,86 @@ const ConfiguraPedido = ({ product }) => {
                     {/* Progress Steps - Mantemos 3 passos na interface, mas pulamos o 2 no fluxo */}
                     <div className="max-w-3xl mx-auto mb-8">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="flex flex-col items-center">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-brand text-white' : 'bg-gray-300 text-gray-600'}`}>
-                                    {currentStep > 1 ? <Check size={20} /> : 1}
+                            <div className="flex items-center">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
+                                    {currentStep > 1 ? <Check size={16} /> : 1}
                                 </div>
-                                <span className="text-sm mt-2 dark:text-white">Produto</span>
+                                <p className={`ml-2 ${currentStep >= 1 ? 'font-medium' : 'text-gray-500'}`}>Operadora</p>
                             </div>
-                            <div className="flex-1 h-1 bg-gray-300 mx-2">
-                                <div className={`h-full ${currentStep >= 3 ? 'bg-brand' : 'bg-gray-300'}`} style={{ width: `${currentStep > 1 ? '100%' : '0%'}` }}></div>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-brand text-white' : 'bg-gray-300 text-gray-600'}`}>
-                                    {currentStep > 3 ? <Check size={20} /> : 2}
+                            <div className="h-0.5 w-12 bg-gray-300"></div>
+                            <div className="flex items-center">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
+                                    {currentStep > 2 ? <Check size={16} /> : 2}
                                 </div>
-                                <span className="text-sm mt-2 dark:text-white">Pagamento</span>
+                                <p className={`ml-2 ${currentStep >= 2 ? 'font-medium' : 'text-gray-500'}`}>Endereço</p>
+                            </div>
+                            <div className="h-0.5 w-12 bg-gray-300"></div>
+                            <div className="flex items-center">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
+                                    {currentStep > 3 ? <Check size={16} /> : 3}
+                                </div>
+                                <p className={`ml-2 ${currentStep >= 3 ? 'font-medium' : 'text-gray-500'}`}>Pagamento</p>
                             </div>
                         </div>
                     </div>
 
-                    {currentStep === 1 && (
-                        <>
-                            <OrderConfiguration product={product} />
-                            {showProviderSelector && (
-                                <div className="mt-5">
-                                    <InternetProviderSelector
+                    <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 shadow-md rounded-lg p-6 transition-colors">
+                        {currentStep === 1 && (
+                            <div>
+                                <h2 className="text-xl font-bold mb-6 dark:text-white">Escolha sua operadora</h2>
+                                {showProviderSelector ? (
+                                    <InternetProviderSelector 
                                         selectedProvider={selectedProvider}
                                         onProviderChange={handleProviderChange}
-                                        availableProviders={product.linkOperadoras || []}
+                                        product={product}
                                     />
-                                </div>
-                            )}
-                            <div className="max-w-3xl mx-auto overflow-hidden mt-4">
-                                <button 
-                                    onClick={nextStep}
-                                    className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 mt-5 h-12 w-full text-base"
-                                >
-                                    Continuar para Pagamento <ChevronRight size={20} className="ml-2" />
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {currentStep === 3 && (
-                        <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 overflow-hidden rounded-lg shadow transition-colors">
-                            <h2 className="text-lg font-medium p-4 dark:text-white">Método de Pagamento</h2>
-                            
-                            <div className="p-4 flex flex-col gap-4">
-                                <div className="border rounded-md p-4">
-                                    <h3 className="font-medium mb-2 dark:text-white">Ir para Checkout Seguro</h3>
-                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                        Você será redirecionado para uma página de pagamento segura para finalizar sua compra.
-                                    </p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                        Maquininha selecionada: <strong>{product.name}</strong>
-                                        {showProviderSelector && (
-                                            <> com chip <strong>{getProviderName(selectedProvider)}</strong></>
-                                        )}
-                                    </p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                                        Você fornecerá detalhes de endereço e forma de pagamento na próxima tela.
-                                    </p>
-                                </div>
-                                
-                                <div className="flex justify-between mt-4">
+                                ) : (
+                                    <div className="text-center py-4">
+                                        <p className="text-gray-600 dark:text-gray-300 mb-4">
+                                            Este modelo não requer seleção de operadora.
+                                        </p>
+                                    </div>
+                                )}
+                                <div className="mt-8 flex justify-end">
                                     <button 
+                                        className="flex items-center justify-center px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-primary-dark transition-colors"
+                                        onClick={nextStep}
+                                    >
+                                        Continuar
+                                        <ChevronRight size={20} className="ml-2" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {currentStep === 3 && (
+                            <div>
+                                <h2 className="text-xl font-bold mb-6 dark:text-white">Finalizar pedido</h2>
+                                
+                                <OrderConfiguration 
+                                    product={product}
+                                    providerName={getProviderName(selectedProvider)}
+                                />
+                                
+                                <div className="mt-8 flex justify-between">
+                                    <button 
+                                        className="px-6 py-3 border border-gray-300 text-gray-700 dark:text-white dark:border-gray-600 font-medium rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                                         onClick={prevStep}
-                                        className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 h-12 w-1/4 text-base"
                                     >
                                         Voltar
                                     </button>
-                                    <a 
-                                        href={buyLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 h-12 w-2/3 text-base"
+                                    
+                                    <button 
+                                        className="flex items-center justify-center px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-primary-dark transition-colors"
+                                        onClick={nextStep}
                                     >
-                                        Finalizar Pedido <ExternalLink size={20} className="ml-2" />
-                                    </a>
+                                        Finalizar compra
+                                        <ExternalLink size={18} className="ml-2" />
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
         </section>
