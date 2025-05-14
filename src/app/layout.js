@@ -37,18 +37,33 @@ export const metadata = {
 
 async function getTrackingConfigurations() {
   try {
-    // Construa a URL base de forma segura
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    // Definir a URL absoluta correta para o ambiente de produção
+    // Vercel define VERCEL_URL como hostname somente (sem https://)
+    const protocol = process.env.NODE_ENV === 'production' ? 'https://' : 'http://';
+    const hostname = process.env.NEXT_PUBLIC_BASE_URL || 
+                    (process.env.VERCEL_URL ? `${protocol}${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    
+    // Garantir que hostname tenha o protocolo correto
+    const baseUrl = hostname.startsWith('http') ? hostname : `${protocol}${hostname}`;
+    
+    console.log('BASE URL para busca de tracking:', baseUrl);
+    
+    // Fazer a requisição para API com o baseUrl corrigido
     const response = await fetch(`${baseUrl}/api/configurations/tracking`, {
-      next: { revalidate: 86400 }, // Revalidação a cada 24 horas, já que configurações de tracking mudam raramente
+      next: { revalidate: 3600 }, // Reduzido o tempo de revalidação para 1 hora
+      cache: 'no-store' // Garantir que sempre busque dados atualizados
     });
 
     if (!response.ok) {
       console.error(`Erro ao buscar configurações de tracking: ${response.status} ${response.statusText}`);
       return { facebookPixelId: null, tiktokPixelId: null, googleTagId: null };
     }
+    
     const data = await response.json();
-    return data.settings || { facebookPixelId: null, tiktokPixelId: null, googleTagId: null };
+    console.log('Dados de tracking recebidos:', data?.settings);
+    
+    // Garantir que returnamos um objeto válido mesmo se settings não existir
+    return data?.settings || { facebookPixelId: null, tiktokPixelId: null, googleTagId: null };
   } catch (error) {
     console.error('Falha ao buscar configurações de tracking no RootLayout:', error);
     return { facebookPixelId: null, tiktokPixelId: null, googleTagId: null }; // Fallback em caso de erro de fetch
