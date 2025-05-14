@@ -50,8 +50,7 @@ async function getTrackingConfigurations() {
     
     // Fazer a requisição para API com o baseUrl corrigido
     const response = await fetch(`${baseUrl}/api/configurations/tracking`, {
-      next: { revalidate: 3600 }, // Reduzido o tempo de revalidação para 1 hora
-      cache: 'no-store' // Garantir que sempre busque dados atualizados
+      next: { revalidate: 3600 }, // Revalidação a cada 1 hora
     });
 
     if (!response.ok) {

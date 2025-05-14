@@ -1,16 +1,24 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '../../../../lib/mongodb'; // Ajuste o caminho se necessário
 
-export const dynamic = 'force-dynamic'; // Garante que a API não seja cacheada
+// Definir como cache: 86400 (24 horas) para que possa funcionar com geração estática
+export const revalidate = 86400;
 
 const CONFIG_ID = "site_tracking_settings"; // ID fixo para o documento de configuração
 
 // GET /api/configurations/tracking
 export async function GET(request) {
   try {
+    // Log para debug
+    console.log('API: Recebendo requisição GET /api/configurations/tracking');
+    
     const { db } = await connectToDatabase();
     if (!db) {
-      return NextResponse.json({ error: 'Banco de dados não disponível' }, { status: 500 });
+      console.error('Banco de dados não disponível');
+      return NextResponse.json({ 
+        settings: { facebookPixelId: '', tiktokPixelId: '', googleTagId: '' },
+        error: 'Banco de dados não disponível'
+      });
     }
 
     const configurationsCollection = db.collection('configurations');
@@ -18,6 +26,7 @@ export async function GET(request) {
 
     if (!settings) {
       // Se não houver configurações, retorna valores padrão/vazios
+      console.log('Nenhuma configuração de tracking encontrada, retornando valores vazios');
       settings = {
         _id: CONFIG_ID,
         facebookPixelId: '',
@@ -25,8 +34,8 @@ export async function GET(request) {
         googleTagId: '',
         lastUpdatedAt: new Date()
       };
-      // Opcionalmente, poderia criar o documento aqui se não existir
-      // await configurationsCollection.insertOne(settings); 
+    } else {
+      console.log('Configurações de tracking encontradas:', settings);
     }
     
     // Remover _id da resposta se não for necessário no frontend
@@ -35,7 +44,11 @@ export async function GET(request) {
     return NextResponse.json({ settings: trackingSettings });
   } catch (error) {
     console.error('Erro ao buscar configurações de rastreamento:', error);
-    return NextResponse.json({ error: 'Erro interno do servidor ao buscar configurações' }, { status: 500 });
+    // Retornar valores vazios em caso de erro para não quebrar a renderização
+    return NextResponse.json({ 
+      settings: { facebookPixelId: '', tiktokPixelId: '', googleTagId: '' },
+      error: 'Erro interno do servidor ao buscar configurações'
+    });
   }
 }
 
