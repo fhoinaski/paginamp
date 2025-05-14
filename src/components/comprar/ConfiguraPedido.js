@@ -128,21 +128,6 @@ const ConfiguraPedido = ({ product }) => {
 
     const nextStep = () => {
         if (currentStep === 1) {
-            // Disparar evento InitiateCheckout quando o usuário prossegue para o pagamento
-            if (product && typeof window !== 'undefined') {
-                // Usar o objeto global MPTracker para rastrear eventos
-                if (window.MPTracker) {
-                    try {
-                        window.MPTracker.trackInitiateCheckout(product);
-                        console.log(`Evento InitiateCheckout para ${product.name} enviado via MPTracker em ConfiguraPedido`);
-                    } catch (error) {
-                        console.error('Erro ao rastrear evento InitiateCheckout:', error);
-                    }
-                } else {
-                    console.warn('MPTracker não está disponível. Evento InitiateCheckout não rastreado em ConfiguraPedido.');
-                }
-            }
-            
             // Pular a etapa 2 (endereço) e ir diretamente para a etapa 3 (pagamento)
             setCurrentStep(3);
         } else if (currentStep === 3) {
@@ -175,86 +160,87 @@ const ConfiguraPedido = ({ product }) => {
                     {/* Progress Steps - Mantemos 3 passos na interface, mas pulamos o 2 no fluxo */}
                     <div className="max-w-3xl mx-auto mb-8">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
-                                    {currentStep > 1 ? <Check size={16} /> : 1}
+                            <div className="flex flex-col items-center">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-brand text-white' : 'bg-gray-300 text-gray-600'}`}>
+                                    {currentStep > 1 ? <Check size={20} /> : 1}
                                 </div>
-                                <p className={`ml-2 ${currentStep >= 1 ? 'font-medium' : 'text-gray-500'}`}>Operadora</p>
+                                <span className="text-sm mt-2 dark:text-white">Produto</span>
                             </div>
-                            <div className="h-0.5 w-12 bg-gray-300"></div>
-                            <div className="flex items-center">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
-                                    {currentStep > 2 ? <Check size={16} /> : 2}
-                                </div>
-                                <p className={`ml-2 ${currentStep >= 2 ? 'font-medium' : 'text-gray-500'}`}>Endereço</p>
+                            <div className="flex-1 h-1 bg-gray-300 mx-2">
+                                <div className={`h-full ${currentStep >= 3 ? 'bg-brand' : 'bg-gray-300'}`} style={{ width: `${currentStep > 1 ? '100%' : '0%'}` }}></div>
                             </div>
-                            <div className="h-0.5 w-12 bg-gray-300"></div>
-                            <div className="flex items-center">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
-                                    {currentStep > 3 ? <Check size={16} /> : 3}
+                            <div className="flex flex-col items-center">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-brand text-white' : 'bg-gray-300 text-gray-600'}`}>
+                                    {currentStep > 3 ? <Check size={20} /> : 2}
                                 </div>
-                                <p className={`ml-2 ${currentStep >= 3 ? 'font-medium' : 'text-gray-500'}`}>Pagamento</p>
+                                <span className="text-sm mt-2 dark:text-white">Pagamento</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 shadow-md rounded-lg p-6 transition-colors">
-                        {currentStep === 1 && (
-                            <div>
-                                <h2 className="text-xl font-bold mb-6 dark:text-white">Escolha sua operadora</h2>
-                                {showProviderSelector ? (
-                                    <InternetProviderSelector 
+                    {currentStep === 1 && (
+                        <>
+                            <OrderConfiguration product={product} />
+                            {showProviderSelector && (
+                                <div className="mt-5">
+                                    <InternetProviderSelector
                                         selectedProvider={selectedProvider}
                                         onProviderChange={handleProviderChange}
-                                        product={product}
+                                        availableProviders={product.linkOperadoras || []}
                                     />
-                                ) : (
-                                    <div className="text-center py-4">
-                                        <p className="text-gray-600 dark:text-gray-300 mb-4">
-                                            Este modelo não requer seleção de operadora.
-                                        </p>
-                                    </div>
-                                )}
-                                <div className="mt-8 flex justify-end">
-                                    <button 
-                                        className="flex items-center justify-center px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-primary-dark transition-colors"
-                                        onClick={nextStep}
-                                    >
-                                        Continuar
-                                        <ChevronRight size={20} className="ml-2" />
-                                    </button>
                                 </div>
+                            )}
+                            <div className="max-w-3xl mx-auto overflow-hidden mt-4">
+                                <button 
+                                    onClick={nextStep}
+                                    className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 mt-5 h-12 w-full text-base"
+                                >
+                                    Continuar para Pagamento <ChevronRight size={20} className="ml-2" />
+                                </button>
                             </div>
-                        )}
+                        </>
+                    )}
 
-                        {currentStep === 3 && (
-                            <div>
-                                <h2 className="text-xl font-bold mb-6 dark:text-white">Finalizar pedido</h2>
+                    {currentStep === 3 && (
+                        <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 overflow-hidden rounded-lg shadow transition-colors">
+                            <h2 className="text-lg font-medium p-4 dark:text-white">Método de Pagamento</h2>
+                            
+                            <div className="p-4 flex flex-col gap-4">
+                                <div className="border rounded-md p-4">
+                                    <h3 className="font-medium mb-2 dark:text-white">Ir para Checkout Seguro</h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                                        Você será redirecionado para uma página de pagamento segura para finalizar sua compra.
+                                    </p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                                        Maquininha selecionada: <strong>{product.name}</strong>
+                                        {showProviderSelector && (
+                                            <> com chip <strong>{getProviderName(selectedProvider)}</strong></>
+                                        )}
+                                    </p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                                        Você fornecerá detalhes de endereço e forma de pagamento na próxima tela.
+                                    </p>
+                                </div>
                                 
-                                <OrderConfiguration 
-                                    product={product}
-                                    providerName={getProviderName(selectedProvider)}
-                                />
-                                
-                                <div className="mt-8 flex justify-between">
+                                <div className="flex justify-between mt-4">
                                     <button 
-                                        className="px-6 py-3 border border-gray-300 text-gray-700 dark:text-white dark:border-gray-600 font-medium rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                                         onClick={prevStep}
+                                        className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 h-12 w-1/4 text-base"
                                     >
                                         Voltar
                                     </button>
-                                    
-                                    <button 
-                                        className="flex items-center justify-center px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-primary-dark transition-colors"
-                                        onClick={nextStep}
+                                    <a 
+                                        href={buyLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="relative inline-flex items-center justify-center shrink-0 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand hover:bg-brand-dark text-white py-2 px-4 h-12 w-2/3 text-base"
                                     >
-                                        Finalizar compra
-                                        <ExternalLink size={18} className="ml-2" />
-                                    </button>
+                                        Finalizar Pedido <ExternalLink size={20} className="ml-2" />
+                                    </a>
                                 </div>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
