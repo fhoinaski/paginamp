@@ -85,7 +85,10 @@ const TestimonialSlider = () => {
                   alt={`Foto de ${currentTestimonial.name} de ${currentTestimonial.location} - Cliente satisfeito com maquininha Point`}
                   width={220}
                   height={220}
-                  priority={true}
+                  loading="lazy"
+                  sizes="(max-width: 768px) 144px, 220px"
+                  quality={85}
+                  className="rounded-full object-cover"
                 />
               </div>
               <div className="space-y-6 text-center sm:text-left">

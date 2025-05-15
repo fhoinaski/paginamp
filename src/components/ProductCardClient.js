@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import ProductCard from './ui/ProductCard';
+import ProductCard from './ProductCard';
 import { useProductCard } from '../hooks/useProductCard';
 
 /**

@@ -1,10 +1,19 @@
 // src/app/layout.js
 import "./globals.css";
 import Script from 'next/script';
+import { Inter } from 'next/font/google';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { AuthProvider } from '../contexts/AuthContext';
 import { TaxasModalProvider } from '../contexts/TaxasModalContext';
 import ClientLayout from '../components/ClientLayout';
+
+// Configurar a fonte Inter com next/font
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  weight: ['400', '500', '600', '700'],
+});
 
 export const metadata = {
   title: {
@@ -113,7 +122,7 @@ export default async function RootLayout({ children }) {
   console.log(`[layout.js] Configs finais para pixels: FB: ${trackingConfig.facebookPixelId}, TT: ${tiktokPixelIdToUse}, GA: ${trackingConfig.googleTagId}`);
 
   return (
-    <html lang="pt-br" className="scroll-smooth">
+    <html lang="pt-br" className={`scroll-smooth ${inter.variable}`}>
       <head>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='%23009EE3' rx='5.273' ry='5.273'></rect><rect width='27.984' height='12.023' x='4.008' y='4.008' fill='%23A5F3FC' rx='1.758' ry='1.758'></rect><g fill='%232E3441'><circle cx='6.012' cy='21.973' r='2.004'></circle><circle cx='6.012' cy='29.988' r='2.004'></circle><circle cx='14.027' cy='21.973' r='2.004'></circle><circle cx='14.027' cy='29.988' r='2.004'></circle><circle cx='21.973' cy='21.973' r='2.004'></circle><circle cx='21.973' cy='29.988' r='2.004'></circle><circle cx='29.988' cy='21.973' r='2.004'></circle><circle cx='29.988' cy='29.988' r='2.004'></circle></g></svg>" type="image/svg+xml" />
       </head>
